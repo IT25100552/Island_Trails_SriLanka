@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<nav th:fragment="navbar" class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+        <!-- Brand Wordmark -->
+        <a class="navbar-brand d-flex align-items-center gap-2" th:href="@{/}">
+            <span class="nav-brand-symbol">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-warning">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="currentColor"></polygon>
+                </svg>
+            </span>
+            <span class="nav-brand-title">Island Trails</span>
+            <span class="nav-brand-tag">Lanka</span>
+        </a>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <!-- Primary Navigation Links (Minimalist Text Links, Clean Spacing) -->
+            <ul class="navbar-nav mx-auto mb-2 mb-lg-0 nav-main-links">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/catalog/search}">Tour Packages</a>
+                </li>
+
+                <!-- Customer Account Direct Links -->
+                <li class="nav-item" sec:authorize="hasRole('CUSTOMER')">
+                    <a class="nav-link" th:href="@{/customer/bookings}">My Bookings</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasRole('CUSTOMER')">
+                    <a class="nav-link" th:href="@{/customer/trip-requests}">Custom Trips</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasRole('CUSTOMER')">
+                    <a class="nav-link" th:href="@{/customer/support/tickets}">Support</a>
+                </li>
+            </ul>
+
+            <!-- Right: Staff Switch / Auth & Profile Actions -->
+            <div class="d-flex align-items-center gap-3">
+                <!-- Staff Portal Pill (Discreet, executive appearance) -->
+                <div class="dropdown" sec:authorize="hasAnyRole('TOUR_OPS_MANAGER', 'TRAVEL_CONSULTANT', 'FINANCE_OFFICER', 'CUSTOMER_RELATIONS_OFFICER', 'IT_SYSTEMS_OFFICER')">
+                    <a class="nav-staff-pill dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="nav-staff-dot"></span>
+                        <span>Staff Suite</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end nav-dropdown-menu shadow">
+                        <!-- Tour Ops Manager -->
+                        <li sec:authorize="hasRole('TOUR_OPS_MANAGER')">
+                            <span class="dropdown-header">Tour Operations</span>
+                        </li>
+                        <li sec:authorize="hasRole('TOUR_OPS_MANAGER')"><a class="dropdown-item" th:href="@{/staff/tour-ops/packages}">Manage Packages</a></li>
+                        <li sec:authorize="hasRole('TOUR_OPS_MANAGER')"><a class="dropdown-item" th:href="@{/staff/tour-ops/resources}">Resource Inventory</a></li>
+                        <li sec:authorize="hasRole('TOUR_OPS_MANAGER')"><a class="dropdown-item" th:href="@{/staff/tour-ops/calendar}">Availability Calendar</a></li>
+                        <li sec:authorize="hasRole('TOUR_OPS_MANAGER')"><a class="dropdown-item" th:href="@{/staff/tour-ops/bookings}">Live Bookings</a></li>
+                        <li sec:authorize="hasRole('TOUR_OPS_MANAGER')"><a class="dropdown-item" th:href="@{/staff/tour-ops/reports/utilization}">Utilization Report</a></li>
+
+                        <!-- Travel Consultant -->
+                        <li sec:authorize="hasRole('TRAVEL_CONSULTANT')">
+                            <span class="dropdown-header">Travel Consulting</span>
+                        </li>
+                        <li sec:authorize="hasRole('TRAVEL_CONSULTANT')"><a class="dropdown-item" th:href="@{/staff/consultant/trip-requests}">Quotation Builder</a></li>
+
+                        <!-- Finance Officer -->
+                        <li sec:authorize="hasRole('FINANCE_OFFICER')">
+                            <span class="dropdown-header">Finance & Billing</span>
+                        </li>
+                        <li sec:authorize="hasRole('FINANCE_OFFICER')"><a class="dropdown-item" th:href="@{/staff/finance/payments}">Payment Transactions</a></li>
+                        <li sec:authorize="hasRole('FINANCE_OFFICER')"><a class="dropdown-item" th:href="@{/staff/finance/refunds}">Refund Approvals</a></li>
+                        <li sec:authorize="hasRole('FINANCE_OFFICER')"><a class="dropdown-item" th:href="@{/staff/finance/reports}">Reconciliation Report</a></li>
+
+                        <!-- Support Staff -->
+                        <li sec:authorize="hasRole('CUSTOMER_RELATIONS_OFFICER')">
+                            <span class="dropdown-header">Customer Relations</span>
+                        </li>
+                        <li sec:authorize="hasRole('CUSTOMER_RELATIONS_OFFICER')"><a class="dropdown-item" th:href="@{/staff/support/tickets}">Support Queue</a></li>
+
+                        <!-- IT Systems Officer -->
+                        <li sec:authorize="hasRole('IT_SYSTEMS_OFFICER')">
+                            <span class="dropdown-header">IT Administration</span>
+                        </li>
+                        <li sec:authorize="hasRole('IT_SYSTEMS_OFFICER')"><a class="dropdown-item" th:href="@{/admin/dashboard}">Admin Dashboard</a></li>
+                        <li sec:authorize="hasRole('IT_SYSTEMS_OFFICER')"><a class="dropdown-item" th:href="@{/admin/users}">User & Staff Accounts</a></li>
+                        <li sec:authorize="hasRole('IT_SYSTEMS_OFFICER')"><a class="dropdown-item" th:href="@{/admin/audit-log}">Audit Trail</a></li>
+                        <li sec:authorize="hasRole('IT_SYSTEMS_OFFICER')"><a class="dropdown-item" th:href="@{/admin/settings}">System Settings</a></li>
+                    </ul>
+                </div>
+
+                <!-- Anonymous Visitor: Clean Text Login + Refined Accent CTA -->
+                <div class="d-flex align-items-center gap-2" sec:authorize="isAnonymous()">
+                    <a class="nav-link text-white-50 px-2 fw-medium" th:href="@{/auth/login}">Log In</a>
+                    <a class="btn btn-nav-cta" th:href="@{/auth/register}">Get Started</a>
+                </div>
+
+                <!-- Authenticated User Profile Monogram Chip -->
+                <div class="dropdown" sec:authorize="isAuthenticated()">
+                    <a class="nav-user-chip dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="nav-user-avatar" th:text="${#strings.substring(#authentication.name, 0, 1).toUpperCase()}">U</span>
+                        <span class="nav-user-name" sec:authentication="name">User</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end nav-dropdown-menu shadow">
+                        <li class="dropdown-header text-truncate" style="max-width: 200px;">
+                            Signed in as <strong class="text-dark d-block" sec:authentication="name">user@example.com</strong>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li sec:authorize="hasRole('CUSTOMER')">
+                            <a class="dropdown-item" th:href="@{/customer/dashboard}">Dashboard</a>
+                        </li>
+                        <li sec:authorize="hasRole('CUSTOMER')">
+                            <a class="dropdown-item" th:href="@{/customer/bookings}">My Bookings</a>
+                        </li>
+                        <li sec:authorize="hasRole('CUSTOMER')">
+                            <a class="dropdown-item" th:href="@{/customer/trip-requests}">Custom Inquiries</a>
+                        </li>
+                        <li sec:authorize="hasRole('CUSTOMER')">
+                            <a class="dropdown-item" th:href="@{/customer/support/tickets}">Support Tickets</a>
+                        </li>
+                        <li sec:authorize="hasRole('CUSTOMER')">
+                            <a class="dropdown-item" th:href="@{/customer/account}">Account Settings</a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/auth/logout}" method="post" class="d-inline">
+                                <button type="submit" class="dropdown-item text-danger">Sign Out</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+</body>
+</html>

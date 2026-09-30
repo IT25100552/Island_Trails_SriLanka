@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Global System Settings - Island Trails Lanka</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="mb-4">
+        <h1 class="h2 fw-bold mb-1">Global System Configuration</h1>
+        <p class="text-muted small">Manage profit margins, system thresholds, and operational parameters</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm rounded-4 p-4 bg-white">
+                <h2 class="h5 fw-bold mb-3"><i class="bi bi-gear-wide-connected text-primary me-2"></i> Active Configuration Keys</h2>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Setting Key</th>
+                                <th>Current Value</th>
+                                <th>Description</th>
+                                <th>Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="cfg : ${configs}">
+                                <td class="fw-bold font-monospace" th:text="${cfg.key}">PROFIT_MARGIN_PERCENTAGE</td>
+                                <td><span class="badge badge-subtle-info fs-6 tabular-nums" th:text="${cfg.value}">15.00</span></td>
+                                <td class="small text-muted" th:text="${cfg.description}">Description</td>
+                                <td class="small text-muted tabular-nums" th:text="${#temporals.format(cfg.updatedAt, 'yyyy-MM-dd HH:mm')}">Date</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm rounded-4 p-4 bg-white">
+                <h2 class="h5 fw-bold mb-3"><i class="bi bi-pencil-square text-warning me-2"></i> Update Setting</h2>
+                <form th:action="@{/admin/settings}" method="post">
+                    <div class="mb-3">
+                        <label for="cfg-key" class="form-label text-muted small fw-bold">Configuration Key</label>
+                        <input type="text" id="cfg-key" name="key" class="form-control" value="PROFIT_MARGIN_PERCENTAGE" required maxlength="100">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="cfg-value" class="form-label text-muted small fw-bold">New Value</label>
+                        <input type="text" id="cfg-value" name="value" class="form-control tabular-nums" placeholder="e.g. 15.00" required maxlength="255">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="cfg-desc" class="form-label text-muted small fw-bold">Description</label>
+                        <textarea id="cfg-desc" name="description" class="form-control" rows="2" placeholder="Setting explanation..." maxlength="500"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-warning fw-bold w-100">Save Configuration</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

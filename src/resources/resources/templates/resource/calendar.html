@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Resource Availability Calendar - Island Trails Lanka</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold mb-1">Resource Availability Calendar</h1>
+            <p class="text-muted small mb-0">Live date-range reservations and scheduling conflict inspector</p>
+        </div>
+        <a th:href="@{/staff/tour-ops/reports/utilization}" class="btn btn-outline-primary fw-bold">
+            <i class="bi bi-bar-chart-line me-1"></i> Utilization Report
+        </a>
+    </div>
+
+    <!-- Date Range Selector -->
+    <div class="card shadow-sm rounded-4 p-4 bg-white mb-4">
+        <form th:action="@{/staff/tour-ops/calendar}" method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="cal-start" class="form-label text-muted small fw-bold">Start Date</label>
+                <input type="date" id="cal-start" name="startDate" th:value="${startDate}" class="form-control tabular-nums" required>
+            </div>
+            <div class="col-md-4">
+                <label for="cal-end" class="form-label text-muted small fw-bold">End Date</label>
+                <input type="date" id="cal-end" name="endDate" th:value="${endDate}" class="form-control tabular-nums" required>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100 fw-bold"><i class="bi bi-filter me-1"></i> Refresh Schedule</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Calendar Table of Active Assignments -->
+    <div class="card shadow-sm rounded-4 p-4 bg-white">
+        <h2 class="h5 fw-bold mb-3"><i class="bi bi-calendar-event text-primary me-2"></i> Reserved & Committed Assignments</h2>
+
+        <div class="table-responsive" th:if="${not #lists.isEmpty(assignments)}">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Assignment #</th>
+                        <th>Assigned Resource</th>
+                        <th>Type</th>
+                        <th>Blocked Tour Dates</th>
+                        <th>Status</th>
+                        <th>Tour Package / Booking</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="a : ${assignments}">
+                        <td class="fw-bold tabular-nums" th:text="'#' + ${a.id}">#1</td>
+                        <td>
+                            <div class="fw-bold text-dark" th:text="${resourceMap != null && resourceMap.containsKey(a.resourceId) ? resourceMap.get(a.resourceId).name : 'Resource #' + a.resourceId}">Toyota KDH Van</div>
+                            <small class="text-muted tabular-nums" th:text="'Resource ID: #' + ${a.resourceId}">#1</small>
+                        </td>
+                        <td>
+                            <span class="badge badge-subtle-neutral"
+                                  th:if="${resourceMap != null && resourceMap.containsKey(a.resourceId)}"
+                                  th:text="${resourceMap.get(a.resourceId).resourceType}">VEHICLE</span>
+                        </td>
+                        <td>
+                            <span class="fw-semibold text-dark tabular-nums" th:text="${a.startDate} + ' &rarr; ' + ${a.endDate}">2026-09-01 &rarr; 2026-09-05</span>
+                            <div class="small text-danger fw-bold"><i class="bi bi-lock-fill me-1"></i> Blocked / Protected</div>
+                        </td>
+                        <td>
+                            <span class="badge" th:classappend="${a.status.name() == 'CONFIRMED' ? 'badge-subtle-success' : 'badge-subtle-warning'}" th:text="${a.status}">RESERVED</span>
+                        </td>
+                        <td>
+                            <div th:if="${a.packageId != null}">
+                                <span class="fw-bold text-primary" th:text="${packageMap != null && packageMap.containsKey(a.packageId) ? packageMap.get(a.packageId) : 'Package #' + a.packageId}">Package Name</span>
+                                <small class="text-muted d-block tabular-nums" th:text="'(Package #' + ${a.packageId} + ')'">(Package #1)</small>
+                            </div>
+                            <div th:if="${a.bookingId != null}">
+                                <span class="badge badge-subtle-neutral tabular-nums" th:text="'Booking #' + ${a.bookingId}">Booking #1</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${#lists.isEmpty(assignments)}" class="text-center py-4 text-muted">
+            <p class="mb-0">No resource reservations or assignments found for the selected date window.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

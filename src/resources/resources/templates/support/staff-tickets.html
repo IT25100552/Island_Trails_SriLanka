@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Support Queue - Customer Relations Officer</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold mb-1">Support Tickets & Inquiry Triage</h1>
+            <p class="text-muted small mb-0">Auto-routed tickets organized by department with SLA priority highlighting</p>
+        </div>
+    </div>
+
+    <!-- Department & Status Filters -->
+    <div class="card shadow-sm rounded-4 p-4 bg-white mb-4">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-6">
+                <span class="fw-bold small text-muted d-block mb-1">Filter by Department:</span>
+                <div class="d-flex gap-1 flex-wrap">
+                    <a th:href="@{/staff/support/tickets}" class="btn btn-sm" th:classappend="${currentDept == null ? 'btn-primary' : 'btn-outline-secondary'}">All</a>
+                    <a th:each="d : ${departments}" th:href="@{/staff/support/tickets(department=${d})}" class="btn btn-sm"
+                       th:classappend="${currentDept == d ? 'btn-primary' : 'btn-outline-secondary'}" th:text="${d}">FINANCE</a>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <span class="fw-bold small text-muted d-block mb-1">Filter by Status:</span>
+                <div class="d-flex gap-1 flex-wrap">
+                    <a th:each="s : ${statuses}" th:href="@{/staff/support/tickets(status=${s})}" class="btn btn-sm"
+                       th:classappend="${currentStatus == s ? 'btn-primary' : 'btn-outline-secondary'}" th:text="${s}">OPEN</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm rounded-4 p-4 bg-white">
+        <div class="table-responsive" th:if="${not #lists.isEmpty(tickets)}">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Ticket #</th>
+                        <th>Subject</th>
+                        <th>Customer</th>
+                        <th>Department</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Assigned To</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="t : ${tickets}">
+                        <td class="fw-bold tabular-nums" th:text="'#' + ${t.id}">#1</td>
+                        <td>
+                            <div class="fw-bold text-dark" th:text="${t.subject}">Subject</div>
+                            <small class="text-muted tabular-nums" th:text="${#temporals.format(t.createdAt, 'yyyy-MM-dd HH:mm')}">Date</small>
+                        </td>
+                        <td th:text="${t.customerName}">Customer</td>
+                        <td><span class="badge badge-subtle-neutral" th:text="${t.department}">FINANCE</span></td>
+                        <td>
+                            <span class="badge" th:classappend="${t.priority.name() == 'HIGH' ? 'badge-subtle-danger' : (t.priority.name() == 'MEDIUM' ? 'badge-subtle-warning' : 'badge-subtle-info')}" th:text="${t.priority}">HIGH</span>
+                        </td>
+                        <td>
+                            <span class="badge" th:classappend="${t.status.name() == 'RESOLVED' || t.status.name() == 'CLOSED' ? 'badge-subtle-success' : (t.status.name() == 'IN_PROGRESS' ? 'badge-subtle-info' : (t.status.name() == 'SPAM' ? 'badge-subtle-neutral' : 'badge-subtle-warning'))}" th:text="${t.status}">OPEN</span>
+                        </td>
+                        <td class="small text-muted" th:text="${t.assignedToName != null ? t.assignedToName : 'Unassigned'}">Unassigned</td>
+                        <td>
+                            <a th:href="@{/staff/support/ticket/{id}(id=${t.id})}" class="btn btn-warning btn-sm fw-bold">
+                                Triage & Reply &rarr;
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${#lists.isEmpty(tickets)}" class="text-center py-5 text-muted">
+            <p>No support tickets in this queue.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

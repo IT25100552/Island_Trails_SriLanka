@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Island Trails Lanka - Discover Paradise</title>
+</head>
+<body>
+<div th:fragment="content">
+
+    <!-- Full-Bleed Screen-Fitting Hero Banner with Authentic Sigiriya Panorama -->
+    <div class="hero-banner hero-banner-fullbleed position-relative overflow-hidden">
+        <div class="container py-2 py-md-3">
+            <div class="row align-items-center mb-4">
+                <div class="col-lg-10 col-xl-9 text-center text-md-start">
+                    <h1 class="hero-title display-4 text-white fw-bold mb-3">Your Journey. Your Island. Your Story.</h1>
+                    <p class="hero-lead mb-4">
+                        Discover Sri Lanka through unforgettable journeys, handpicked experiences, and the beauty of every trail along the way.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-md-start mb-4">
+                        <a href="#featured-packages" class="btn btn-warning btn-lg px-4 fw-bold shadow-sm">
+                            <i class="bi bi-compass me-2"></i> Explore Tours
+                        </a>
+                        <a th:href="@{/customer/trip-request/new}" class="btn btn-outline-light btn-lg px-4">
+                            <i class="bi bi-pencil-square me-2"></i> Plan Custom Trip
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Integrated Quick Search Card inside Hero Banner -->
+            <div class="card search-card hero-search-card p-4 p-md-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h2 class="h6 fw-bold mb-0 text-dark d-flex align-items-center">
+                        <i class="bi bi-search text-primary me-2"></i> Find Your Tour Package
+                    </h2>
+                    <span class="text-muted small d-none d-sm-inline">Verified Inbound Itineraries</span>
+                </div>
+                <form th:action="@{/catalog/search}" method="get" class="row g-3 align-items-end">
+                    <div class="col-12 col-md-4">
+                        <label for="search-keyword" class="form-label text-muted small fw-bold mb-1">Destination / Keyword</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-geo-alt text-muted"></i></span>
+                            <input type="text" id="search-keyword" name="keyword" class="form-control border-start-0" placeholder="e.g. Sigiriya, Ella, Safari, Mirissa" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <label for="search-maxPrice" class="form-label text-muted small fw-bold mb-1">Max Budget (LKR)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted small fw-semibold">LKR</span>
+                            <input type="number" id="search-maxPrice" name="maxPrice" class="form-control border-start-0" placeholder="e.g. 100000" min="1" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <label for="search-maxDuration" class="form-label text-muted small fw-bold mb-1">Max Duration (Days)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-clock text-muted"></i></span>
+                            <input type="number" id="search-maxDuration" name="maxDuration" class="form-control border-start-0" placeholder="e.g. 5" min="1" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2">
+                            <i class="bi bi-search me-1"></i> Search Tours
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Featured Tour Packages Container -->
+    <div class="container mb-5" id="featured-packages">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h2 class="h3 fw-bold mb-1">Featured Tour Packages</h2>
+                <p class="text-muted small mb-0">Verified itineraries organized by certified local travel specialists</p>
+            </div>
+            <a th:href="@{/catalog/search}" class="btn btn-outline-brand btn-sm">View All Packages &rarr;</a>
+        </div>
+
+        <!-- Tour Cards Grid -->
+        <div class="row g-4" th:if="${not #lists.isEmpty(featuredPackages)}">
+            <div class="col-md-6 col-lg-4" th:each="pkg : ${featuredPackages}">
+                <div class="card h-100 overflow-hidden d-flex flex-column">
+                    <div class="tour-card-image-wrap">
+                        <img th:if="${pkg.imageData != null}"
+                             src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E"
+                             th:src="@{/catalog/package/{id}/image(id=${pkg.id})}"
+                             class="tour-card-img"
+                             th:alt="${pkg.name}"
+                             loading="lazy"
+                             decoding="async">
+                        <div th:if="${pkg.imageData == null}" class="tour-image-fallback">
+                            <i class="bi bi-compass fs-1 mb-2 opacity-75"></i>
+                            <span class="small fw-bold opacity-75" th:text="${pkg.destination}">Sri Lanka</span>
+                        </div>
+                    </div>
+                    <div class="card-body d-flex flex-column p-4">
+                        <div class="d-flex align-items-center justify-content-between text-muted small mb-2">
+                            <span class="fw-semibold text-secondary"><i class="bi bi-geo-alt me-1"></i><span th:text="${pkg.destination}">Destination</span></span>
+                            <span><i class="bi bi-clock me-1 text-primary"></i><span th:text="${pkg.durationDays}">4</span> Days</span>
+                        </div>
+                        <h3 class="h5 fw-bold mb-2">
+                            <a th:href="@{/catalog/package/{id}(id=${pkg.id})}" class="tour-title-link" th:text="${pkg.name}">Tour Name</a>
+                        </h3>
+                        <p class="card-text text-muted small flex-grow-1" th:text="${#strings.abbreviate(pkg.description, 130)}">Tour description snippet...</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                            <div>
+                                <span class="text-muted small d-block">Starting from</span>
+                                <span class="fs-5 fw-bold text-primary" th:text="'LKR ' + ${#numbers.formatDecimal(pkg.basePrice, 0, 'COMMA', 2, 'POINT')}">LKR 75,000</span>
+                            </div>
+                            <a th:href="@{/catalog/package/{id}(id=${pkg.id})}" class="btn btn-warning btn-sm px-3 fw-bold">Explore &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State Fallback -->
+        <div class="row" th:if="${#lists.isEmpty(featuredPackages)}">
+            <div class="col-12">
+                <div class="text-center py-5 bg-white rounded-4 border p-4">
+                    <i class="bi bi-compass text-muted display-5 mb-3 d-block"></i>
+                    <h3 class="h5 fw-bold text-dark mb-2">Curating Island Itineraries</h3>
+                    <p class="text-muted small mb-4">Our certified local specialists are updating seasonal tour packages. Explore our full catalog or request a custom journey.</p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <a th:href="@{/catalog/search}" class="btn btn-primary btn-sm">Browse Catalog</a>
+                        <a th:href="@{/customer/trip-request/new}" class="btn btn-outline-brand btn-sm">Plan Custom Trip</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

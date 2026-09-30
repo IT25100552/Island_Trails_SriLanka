@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Trip Requests & Quotations - Travel Consultant</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold mb-1">Custom Trip Requests Queue</h1>
+            <p class="text-muted small mb-0">Triage customer inquiries, construct itemized quotations with profit margin factoring, and convert approved quotes to bookings</p>
+        </div>
+    </div>
+
+    <div class="card shadow-sm rounded-4 p-4 bg-white">
+        <div class="table-responsive" th:if="${not #lists.isEmpty(requests)}">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Req #</th>
+                        <th>Customer</th>
+                        <th>Travel Dates</th>
+                        <th>Travelers</th>
+                        <th>Customer Budget</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="r : ${requests}">
+                        <td class="fw-bold tabular-nums" th:text="'#' + ${r.id}">#1</td>
+                        <td>
+                            <div class="fw-bold text-dark" th:text="${r.customerName}">Customer Name</div>
+                            <small class="text-muted tabular-nums" th:text="'ID: ' + ${r.customerId}">ID: 1</small>
+                        </td>
+                        <td class="tabular-nums" th:text="${r.startDate} + ' to ' + ${r.endDate}">Dates</td>
+                        <td class="tabular-nums" th:text="${r.numberOfTravelers} + ' Pax'">2 Pax</td>
+                        <td class="fw-bold text-primary tabular-nums" th:text="'LKR ' + ${#numbers.formatDecimal(r.budget, 0, 'COMMA', 2, 'POINT')}">LKR 250,000</td>
+                        <td>
+                            <span class="badge" th:classappend="${r.status.name() == 'SUBMITTED' ? 'badge-subtle-danger' : (r.status.name() == 'QUOTED' ? 'badge-subtle-info' : (r.status.name() == 'ACCEPTED' ? 'badge-subtle-success' : 'badge-subtle-neutral'))}" th:text="${r.status}">SUBMITTED</span>
+                        </td>
+                        <td>
+                            <a th:href="@{/staff/consultant/trip-request/{id}(id=${r.id})}" class="btn btn-warning btn-sm fw-bold">
+                                <i class="bi bi-pencil-square me-1"></i> Open Quotation Builder
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${#lists.isEmpty(requests)}" class="text-center py-5 text-muted">
+            <p>No trip requests currently in queue.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title th:text="${resource.id != null ? 'Edit Resource' : 'Add Resource'} + ' - Island Trails Lanka'">Resource Form</title>
+</head>
+<body>
+<div th:fragment="content" class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 rounded-4 p-4 p-md-5 bg-white">
+            <div class="mb-4">
+                <span class="badge bg-success px-3 py-2 rounded-pill fw-bold mb-2">Tour Operations</span>
+                <h1 class="h3 fw-bold" th:text="${resource.id != null ? 'Edit Resource' : 'Add New Resource'}">Resource Form</h1>
+                <p class="text-muted small">Configure vehicle, guide, accommodation, or activity resource inventory details</p>
+            </div>
+
+            <form th:action="${resource.id != null ? '/staff/tour-ops/resource/' + resource.id + '/edit' : '/staff/tour-ops/resource/new'}"
+                  th:object="${resource}" method="post">
+
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Resource Type</label>
+                        <select th:field="*{resourceType}" id="resourceTypeSelect" class="form-select" required onchange="toggleResourceFields()">
+                            <option th:each="t : ${resourceTypes}" th:value="${t}" th:text="${t}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Status</label>
+                        <select th:field="*{status}" class="form-select">
+                            <option value="ACTIVE">ACTIVE</option>
+                            <option value="INACTIVE">INACTIVE</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Resource Display Name</label>
+                    <input type="text" th:field="*{name}" class="form-control form-control-lg" placeholder="e.g. Toyota KDH Luxury Van - Colombo" required maxlength="150">
+                </div>
+
+                <div class="mb-5">
+                    <label class="form-label fw-semibold">Daily Unit Cost (LKR)</label>
+                    <input type="number" step="0.01" th:field="*{unitCost}" class="form-control" placeholder="18000.00" required min="0" max="10000000">
+                </div>
+
+                <!-- VEHICLE Fields -->
+                <div id="vehicleFields" class="p-4 bg-light rounded-4 mb-5">
+                    <h2 class="h6 fw-bold text-primary mb-3"><i class="bi bi-truck me-1"></i> Vehicle Specifications</h2>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Plate Number</label>
+                            <input type="text" th:field="*{plateNumber}" class="form-control" placeholder="WP-CAB-1234" maxlength="50">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Seat Capacity</label>
+                            <input type="number" th:field="*{seatCapacity}" class="form-control" placeholder="9" min="1" max="100">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Vehicle Model</label>
+                            <input type="text" th:field="*{vehicleModel}" class="form-control" placeholder="HiAce KDH 2022" maxlength="100">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GUIDE Fields -->
+                <div id="guideFields" class="p-4 bg-light rounded-4 mb-5">
+                    <h2 class="h6 fw-bold text-primary mb-3"><i class="bi bi-person-badge me-1"></i> Tour Guide Information</h2>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Languages (comma-separated)</label>
+                            <input type="text" th:field="*{languages}" class="form-control" placeholder="English, German, French" maxlength="200">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Certification #</label>
+                            <input type="text" th:field="*{certification}" class="form-control" placeholder="SLTDA #NTG-481" maxlength="100">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Contact Number</label>
+                            <input type="text" th:field="*{contactNumber}" class="form-control" placeholder="+94 77 123 4567" maxlength="50">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HOTEL ROOM Fields -->
+                <div id="hotelFields" class="p-4 bg-light rounded-4 mb-5">
+                    <h2 class="h6 fw-bold text-primary mb-3"><i class="bi bi-building me-1"></i> Hotel Room Information</h2>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Hotel Name</label>
+                            <input type="text" th:field="*{hotelName}" class="form-control" placeholder="Heritance Kandalama" maxlength="150">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Room Number / Category</label>
+                            <input type="text" th:field="*{roomNumber}" class="form-control" placeholder="Deluxe #204" maxlength="50">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Bed Capacity</label>
+                            <input type="number" th:field="*{bedCapacity}" class="form-control" placeholder="2" min="1" max="20">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-4 mt-4 border-top">
+                    <a th:href="@{/staff/tour-ops/resources}" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-warning fw-bold px-4">
+                        <i class="bi bi-check2-circle me-1"></i> Save Resource
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleResourceFields() {
+    const type = document.getElementById('resourceTypeSelect').value;
+    document.getElementById('vehicleFields').style.display = (type === 'VEHICLE') ? 'block' : 'none';
+    document.getElementById('guideFields').style.display = (type === 'GUIDE') ? 'block' : 'none';
+    document.getElementById('hotelFields').style.display = (type === 'HOTEL_ROOM') ? 'block' : 'none';
+}
+document.addEventListener('DOMContentLoaded', toggleResourceFields);
+</script>
+</body>
+</html>

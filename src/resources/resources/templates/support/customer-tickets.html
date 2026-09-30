@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>My Support Tickets - Island Trails Lanka</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold mb-1">My Support Tickets</h1>
+            <p class="text-muted small">Track resolution status and communications with our customer care and operations teams</p>
+        </div>
+        <a th:href="@{/customer/support/ticket/new}" class="btn btn-primary fw-bold">
+            <i class="bi bi-plus-circle me-1"></i> New Support Ticket
+        </a>
+    </div>
+
+    <div class="card shadow-sm rounded-4 p-4 bg-white">
+        <div class="table-responsive" th:if="${not #lists.isEmpty(tickets)}">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Ticket #</th>
+                        <th>Subject</th>
+                        <th>Category</th>
+                        <th>Routed Dept</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="t : ${tickets}">
+                        <td class="fw-bold tabular-nums" th:text="'#' + ${t.id}">#1</td>
+                        <td>
+                            <div class="fw-bold text-dark" th:text="${t.subject}">Subject</div>
+                            <small class="text-muted" th:text="${#strings.abbreviate(t.description, 60)}">Snippet</small>
+                        </td>
+                        <td><span class="badge badge-subtle-neutral" th:text="${t.category}">GENERAL</span></td>
+                        <td><span class="badge badge-subtle-neutral" th:text="${t.department}">FINANCE</span></td>
+                        <td>
+                            <span class="badge" th:classappend="${t.priority.name() == 'HIGH' ? 'badge-subtle-danger' : (t.priority.name() == 'MEDIUM' ? 'badge-subtle-warning' : 'badge-subtle-info')}" th:text="${t.priority}">HIGH</span>
+                        </td>
+                        <td>
+                            <span class="badge" th:classappend="${t.status.name() == 'RESOLVED' || t.status.name() == 'CLOSED' ? 'badge-subtle-success' : (t.status.name() == 'IN_PROGRESS' ? 'badge-subtle-info' : 'badge-subtle-warning')}" th:text="${t.status}">OPEN</span>
+                        </td>
+                        <td class="small text-muted tabular-nums" th:text="${#temporals.format(t.createdAt, 'yyyy-MM-dd HH:mm')}">Date</td>
+                        <td>
+                            <a th:href="@{/customer/support/ticket/{id}(id=${t.id})}" class="btn btn-outline-primary btn-sm fw-bold">Open Conversation &rarr;</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${#lists.isEmpty(tickets)}" class="text-center py-5 text-muted">
+            <i class="bi bi-headset display-4 mb-2"></i>
+            <h2 class="h5">No support tickets found</h2>
+            <p>Have a question or need assistance with your booking?</p>
+            <a th:href="@{/customer/support/ticket/new}" class="btn btn-primary fw-bold">Submit a Support Ticket</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

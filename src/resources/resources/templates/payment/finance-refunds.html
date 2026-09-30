@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Refund Approvals - Finance Officer</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold mb-2">Finance Operations</span>
+            <h2 class="fw-bold mb-1">Customer Refund Queue (100% Policy)</h2>
+            <p class="text-muted small">Review customer refund requests, approve full 100% refunds, or reject with recorded rationale</p>
+        </div>
+        <a th:href="@{/staff/finance/payments}" class="btn btn-outline-secondary">&larr; Back to Payments</a>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4 p-4 bg-white">
+        <div class="table-responsive" th:if="${not #lists.isEmpty(refunds)}">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Refund #</th>
+                        <th>Booking #</th>
+                        <th>Customer</th>
+                        <th>Reason</th>
+                        <th>Requested</th>
+                        <th>Approved Amount</th>
+                        <th>Status</th>
+                        <th>Decision / Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="ref : ${refunds}">
+                        <td class="fw-bold" th:text="'#' + ${ref.id}">#1</td>
+                        <td class="fw-bold" th:text="'#' + ${ref.bookingId}">#1</td>
+                        <td th:text="${ref.customerName}">Customer</td>
+                        <td class="small text-muted" th:text="${ref.reason}">Reason description</td>
+                        <td class="fw-bold text-dark" th:text="'LKR ' + ${#numbers.formatDecimal(ref.requestedAmount, 0, 'COMMA', 2, 'POINT')}">LKR 150,000</td>
+                        <td class="fw-bold text-danger" th:text="${ref.approvedAmount != null ? 'LKR ' + #numbers.formatDecimal(ref.approvedAmount, 0, 'COMMA', 2, 'POINT') : '-'}">-</td>
+                        <td>
+                            <span class="badge" th:classappend="${ref.status.name() == 'APPROVED' ? 'bg-success' : (ref.status.name() == 'REQUESTED' ? 'bg-warning text-dark' : 'bg-danger')}" th:text="${ref.status}">REQUESTED</span>
+                        </td>
+                        <td>
+                            <div th:if="${ref.status.name() == 'REQUESTED'}" class="d-flex gap-1">
+                                <form th:action="@{/staff/finance/refund/{id}/approve(id=${ref.id})}" method="post">
+                                    <input type="hidden" name="decisionReason" value="Approved 100% full refund by Finance">
+                                    <button type="submit" class="btn btn-success btn-sm fw-bold" onclick="return confirm('Approve 100% refund? This will cancel the booking and release all resources.')">Approve (100%)</button>
+                                </form>
+                                <form th:action="@{/staff/finance/refund/{id}/reject(id=${ref.id})}" method="post">
+                                    <input type="hidden" name="decisionReason" value="Rejected by Finance Officer">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Reject this refund request?')">Reject</button>
+                                </form>
+                            </div>
+                            <div th:if="${ref.status.name() != 'REQUESTED'}" class="small text-muted">
+                                <div th:text="'Decided by: ' + ${ref.decidedByName}">Officer</div>
+                                <code th:if="${ref.refundConfirmationCode != null}" th:text="${ref.refundConfirmationCode}">REF-123</code>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${#lists.isEmpty(refunds)}" class="text-center py-5 text-muted">
+            <p>No refund requests found in the system.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

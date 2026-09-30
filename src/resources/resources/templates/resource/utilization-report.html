@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Resource Utilization Report - Island Trails Lanka</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold mb-1">Resource Utilization Report</h1>
+            <p class="text-muted small mb-0">Comprehensive fleet and guide allocation rates across operational date windows</p>
+        </div>
+        <a th:href="@{/staff/tour-ops/calendar}" class="btn btn-outline-secondary">
+            &larr; Back to Calendar
+        </a>
+    </div>
+
+    <!-- Date Filter -->
+    <div class="card shadow-sm rounded-4 p-4 bg-white mb-4">
+        <form th:action="@{/staff/tour-ops/reports/utilization}" method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="rep-start" class="form-label text-muted small fw-bold">Analysis Start Date</label>
+                <input type="date" id="rep-start" name="startDate" th:value="${startDate}" class="form-control tabular-nums" required>
+            </div>
+            <div class="col-md-4">
+                <label for="rep-end" class="form-label text-muted small fw-bold">Analysis End Date</label>
+                <input type="date" id="rep-end" name="endDate" th:value="${endDate}" class="form-control tabular-nums" required>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100 fw-bold"><i class="bi bi-calculator me-1"></i> Calculate Utilization</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Summary KPI Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card p-3 bg-white stat-card">
+                <div class="text-muted small fw-bold">Average Fleet & Guide Utilization</div>
+                <div class="fs-2 fw-bold text-primary mt-1 tabular-nums" th:text="${averageUtilization} + '%'">24.5%</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3 bg-white stat-card-warning">
+                <div class="text-muted small fw-bold">Analyzed Duration</div>
+                <div class="fs-2 fw-bold text-dark mt-1 tabular-nums" th:text="${totalDays} + ' Days'">30 Days</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3 bg-white stat-card">
+                <div class="text-muted small fw-bold">Tracked Inventory Units</div>
+                <div class="fs-2 fw-bold text-dark mt-1 tabular-nums" th:text="${totalResources}">8</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resource Breakdown Table -->
+    <div class="card shadow-sm rounded-4 p-4 bg-white">
+        <h2 class="h5 fw-bold mb-3"><i class="bi bi-pie-chart-fill text-primary me-2"></i> Utilization Breakdown by Resource</h2>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Resource ID</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Booked Days</th>
+                        <th>Utilization Bar</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="stat : ${resourceStats}">
+                        <td class="fw-bold tabular-nums" th:text="'#' + ${stat.resourceId}">#1</td>
+                        <td class="fw-bold text-dark" th:text="${stat.resourceName}">Resource Name</td>
+                        <td><span class="badge badge-subtle-neutral" th:text="${stat.resourceType}">VEHICLE</span></td>
+                        <td class="tabular-nums" th:text="${stat.bookedDays} + ' / ' + ${stat.totalDays} + ' days'">5 / 30 days</td>
+                        <td style="width: 30%;">
+                            <div class="progress" style="height: 12px;">
+                                <div class="progress-bar bg-success" role="progressbar"
+                                     th:style="'width: ' + ${stat.utilizationPercentage} + '%;'"
+                                     th:aria-valuenow="${stat.utilizationPercentage}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </td>
+                        <td class="fw-bold tabular-nums" th:text="${stat.utilizationPercentage} + '%'">16.7%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

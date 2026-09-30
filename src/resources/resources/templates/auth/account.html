@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Account Settings - Island Trails Lanka</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="mb-4">
+        <h1 class="h2 fw-bold mb-1">My Account Settings</h1>
+        <p class="text-muted small">Manage your personal profile and security credentials</p>
+    </div>
+
+    <div class="row g-4">
+        <!-- Profile info card -->
+        <div class="col-md-6">
+            <div class="card shadow-sm rounded-4 p-4 bg-white h-100">
+                <h2 class="h5 fw-bold mb-3"><i class="bi bi-person-lines-fill text-primary me-2"></i> Profile Information</h2>
+                <form th:action="@{/customer/account/profile}" method="post">
+                    <div class="mb-3">
+                        <label for="profile-email" class="form-label text-muted small fw-bold">Email Address</label>
+                        <input type="text" id="profile-email" class="form-control bg-light" th:value="${user.email}" readonly>
+                        <small class="text-muted">Email address cannot be changed.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="profile-name" class="form-label text-muted small fw-bold">Full Name</label>
+                        <input type="text" id="profile-name" name="name" class="form-control" th:value="${user.name}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="profile-phone" class="form-label text-muted small fw-bold">Phone Number</label>
+                        <input type="text" id="profile-phone" name="phoneNumber" class="form-control" th:value="${user.phoneNumber}">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary fw-bold mt-2">Save Profile Changes</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Security / Password change card -->
+        <div class="col-md-6">
+            <div class="card shadow-sm rounded-4 p-4 bg-white h-100">
+                <h2 class="h5 fw-bold mb-3"><i class="bi bi-shield-lock text-warning me-2"></i> Change Password</h2>
+                <form th:action="@{/customer/account/password}" th:object="${passwordChangeDTO}" method="post">
+                    <div class="mb-3">
+                        <label for="pwd-current" class="form-label text-muted small fw-bold">Current Password</label>
+                        <input type="password" id="pwd-current" th:field="*{oldPassword}" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="pwd-new" class="form-label text-muted small fw-bold">New Password</label>
+                        <input type="password" id="pwd-new" th:field="*{newPassword}" class="form-control" required>
+                        <small class="text-muted d-block mt-1">Min 8 chars, 1 uppercase, 1 number, 1 special character</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-warning fw-bold mt-2">Update Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

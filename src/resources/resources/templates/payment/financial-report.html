@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Financial Reconciliation Report - Finance Officer</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold mb-1">Cash Flow & Financial Reconciliation Report</h1>
+            <p class="text-muted small mb-0">Summary of gross booking income, approved refunds, net profit, and invoices</p>
+        </div>
+        <button onclick="window.print()" class="btn btn-outline-dark fw-bold">
+            <i class="bi bi-printer me-1"></i> Print Report
+        </button>
+    </div>
+
+    <!-- KPI Revenue Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card p-3 bg-white stat-card">
+                <div class="text-muted small fw-bold">Gross Verified Revenue</div>
+                <div class="fs-2 fw-bold text-success mt-1 tabular-nums" th:text="'LKR ' + ${#numbers.formatDecimal(totalGrossRevenue, 0, 'COMMA', 2, 'POINT')}">LKR 150,000</div>
+                <small class="text-muted tabular-nums" th:text="${verifiedPaymentsCount} + ' Verified Payments'">1 Verified</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3 bg-white stat-card-warning">
+                <div class="text-muted small fw-bold">Total Approved Refunds</div>
+                <div class="fs-2 fw-bold text-danger mt-1 tabular-nums" th:text="'LKR ' + ${#numbers.formatDecimal(totalRefunded, 0, 'COMMA', 2, 'POINT')}">LKR 0.00</div>
+                <small class="text-muted tabular-nums" th:text="${approvedRefundsCount} + ' Approved Refunds (100%)'">0 Refunds</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3 bg-white stat-card">
+                <div class="text-muted small fw-bold">Net Cash Flow</div>
+                <div class="fs-2 fw-bold text-primary mt-1 tabular-nums" th:text="'LKR ' + ${#numbers.formatDecimal(netRevenue, 0, 'COMMA', 2, 'POINT')}">LKR 150,000</div>
+                <small class="text-muted">Net realized funds</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoices List -->
+    <div class="card shadow-sm rounded-4 p-4 bg-white mb-4">
+        <h2 class="h5 fw-bold mb-3"><i class="bi bi-receipt-cutoff text-primary me-2"></i> Generated Tax Invoices</h2>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Invoice #</th>
+                        <th>Booking #</th>
+                        <th>Billed Customer</th>
+                        <th>Issue Date</th>
+                        <th>Total Amount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="inv : ${invoices}">
+                        <td class="fw-bold tabular-nums" th:text="${inv.invoiceNumber}">INV-2026-0001</td>
+                        <td class="tabular-nums" th:text="'#' + ${inv.bookingId}">#1</td>
+                        <td th:text="${inv.customerName}">Customer</td>
+                        <td class="tabular-nums" th:text="${inv.issueDate}">2026-08-29</td>
+                        <td class="fw-bold text-primary tabular-nums" th:text="'LKR ' + ${#numbers.formatDecimal(inv.totalAmount, 0, 'COMMA', 2, 'POINT')}">LKR 150,000</td>
+                        <td>
+                            <span class="badge" th:classappend="${inv.status.name() == 'PAID' ? 'badge-subtle-success' : 'badge-subtle-danger'}" th:text="${inv.status}">PAID</span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a th:href="@{/customer/invoice/{id}(id=${inv.id})}" class="btn btn-outline-dark btn-sm">View</a>
+                                <form th:if="${inv.status.name() != 'VOID'}" th:action="@{/staff/finance/invoice/{id}/void(id=${inv.id})}" method="post">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Void this invoice?')">Void</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

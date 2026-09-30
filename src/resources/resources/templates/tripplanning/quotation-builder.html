@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Quotation Builder - Travel Consultant</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold mb-1">
+                Build Quotation for Request <span class="tabular-nums" th:text="'#' + ${tripRequest.id}">#1</span>
+            </h1>
+            <p class="text-muted small mb-0">Customer: <strong th:text="${tripRequest.customerName}">Basith</strong> | Budget: <strong class="text-primary tabular-nums" th:text="'LKR ' + ${#numbers.formatDecimal(tripRequest.budget, 0, 'COMMA', 2, 'POINT')}">250,000</strong></p>
+        </div>
+        <a th:href="@{/staff/consultant/trip-requests}" class="btn btn-outline-secondary">&larr; Back to Requests</a>
+    </div>
+
+    <!-- Trip Request Overview -->
+    <div class="card shadow-sm rounded-4 p-4 bg-white mb-4">
+        <h2 class="h5 fw-bold mb-3"><i class="bi bi-info-circle text-primary me-2"></i> Trip Requirements</h2>
+        <div class="row g-3 small">
+            <div class="col-md-3">
+                <span class="text-muted d-block">Travel Dates</span>
+                <span class="fw-bold fs-6 tabular-nums" th:text="${tripRequest.startDate} + ' to ' + ${tripRequest.endDate}">Dates</span>
+            </div>
+            <div class="col-md-2">
+                <span class="text-muted d-block">Travelers</span>
+                <span class="fw-bold fs-6 tabular-nums" th:text="${tripRequest.numberOfTravelers} + ' Pax'">2 Pax</span>
+            </div>
+            <div class="col-md-3">
+                <span class="text-muted d-block">Interests</span>
+                <span class="fw-bold text-dark" th:text="${tripRequest.interests}">wildlife, culture</span>
+            </div>
+            <div class="col-md-4">
+                <span class="text-muted d-block">Special Requests</span>
+                <span class="text-dark" th:text="${tripRequest.specialRequirements != null ? tripRequest.specialRequirements : 'None'}">Special requests...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Existing Quotations & Versions -->
+    <div th:if="${not #lists.isEmpty(quotations)}" class="card shadow-sm rounded-4 p-4 bg-white mb-4">
+        <h2 class="h5 fw-bold mb-3"><i class="bi bi-clock-history text-warning me-2"></i> Quotation Versions</h2>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle small">
+                <thead class="table-light">
+                    <tr>
+                        <th>Version</th>
+                        <th>Subtotal</th>
+                        <th>Margin %</th>
+                        <th>Total Cost</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="q : ${quotations}">
+                        <td class="fw-bold tabular-nums" th:text="'v' + ${q.quotationVersion}">v1</td>
+                        <td class="tabular-nums" th:text="'LKR ' + ${#numbers.formatDecimal(q.baseSubtotal, 0, 'COMMA', 2, 'POINT')}">LKR 100,000</td>
+                        <td class="tabular-nums" th:text="${q.profitMarginPercent} + '%'">15%</td>
+                        <td class="fw-bold text-primary tabular-nums" th:text="'LKR ' + ${#numbers.formatDecimal(q.totalCost, 0, 'COMMA', 2, 'POINT')}">LKR 115,000</td>
+                        <td>
+                            <span class="badge" th:classappend="${q.status.name() == 'APPROVED' ? 'badge-subtle-success' : (q.status.name() == 'SENT' ? 'badge-subtle-info' : 'badge-subtle-neutral')}" th:text="${q.status}">SENT</span>
+                        </td>
+                        <td class="tabular-nums" th:text="${#temporals.format(q.createdAt, 'yyyy-MM-dd HH:mm')}">Date</td>
+                        <td>
+                            <!-- If APPROVED, can convert to booking -->
+                            <form th:if="${q.status.name() == 'APPROVED'}" th:action="@{/staff/consultant/quotation/{id}/convert(id=${q.id})}" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-success btn-sm fw-bold">Convert to Booking &rarr;</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Quotation Creation / Revision Builder Form -->
+    <div class="card shadow-sm rounded-4 p-4 bg-white">
+        <h2 class="h5 fw-bold mb-3"><i class="bi bi-calculator text-primary me-2"></i> Add / Revise Proposal Line Items</h2>
+
+        <form th:action="${#lists.isEmpty(quotations) ? '/staff/consultant/quotation/create' : '/staff/consultant/quotation/' + quotations[0].id + '/revise'}" method="post">
+            <input type="hidden" name="tripRequestId" th:value="${tripRequest.id}">
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Company Profit Margin (%)</label>
+                    <input type="number" step="0.01" name="profitMarginPercent" class="form-control form-control-lg" th:value="${defaultMargin}" required>
+                    <small class="text-muted">Applied to base resource subtotal.</small>
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label fw-semibold">Itinerary & Route Notes</label>
+                    <textarea name="itineraryNotes" class="form-control" rows="2" placeholder="e.g. Day 1: Colombo Airport to Sigiriya. Day 2: Sigiriya Rock & Dambulla..."></textarea>
+                </div>
+            </div>
+
+            <h3 class="h6 fw-bold text-secondary mb-3">Select Inventory Resources for Itinerary:</h3>
+
+            <div class="table-responsive mb-4">
+                <table class="table table-bordered align-middle small">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 50px;">Select</th>
+                            <th>Resource</th>
+                            <th>Type</th>
+                            <th>Unit Cost (LKR)</th>
+                            <th style="width: 120px;">Quantity / Days</th>
+                            <th>Activity / Itinerary Note</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="res : ${resources}">
+                            <td class="text-center">
+                                <input type="checkbox" name="resourceIds" th:value="${res.id}" class="form-check-input">
+                            </td>
+                            <td class="fw-bold" th:text="${res.name}">Toyota Van</td>
+                            <td><span class="badge bg-secondary" th:text="${res.resourceType}">VEHICLE</span></td>
+                            <td th:text="'LKR ' + ${#numbers.formatDecimal(res.unitCost, 0, 'COMMA', 2, 'POINT')}">18,000</td>
+                            <td>
+                                <input type="number" name="quantities" value="1" min="1" class="form-control form-control-sm">
+                            </td>
+                            <td>
+                                <input type="text" name="descriptions" class="form-control form-control-sm" placeholder="e.g. Dedicated 5 days transport">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                <a th:href="@{/staff/consultant/trip-requests}" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-warning btn-lg fw-bold px-4">
+                    <i class="bi bi-send-check me-2"></i> Save & Send Quotation to Customer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

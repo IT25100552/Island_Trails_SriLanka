@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>System Audit Trail - Island Trails Lanka</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="mb-4">
+        <h1 class="h2 fw-bold mb-1">Security & Operational Audit Log</h1>
+        <p class="text-muted small mb-0">Complete immutable history of administrative actions, logins, role changes, and system events</p>
+    </div>
+
+    <div class="card shadow-sm rounded-4 p-4 bg-white">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Timestamp</th>
+                        <th>Actor Email</th>
+                        <th>Action</th>
+                        <th>Details (Delta)</th>
+                        <th>IP Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="log : ${logs}">
+                        <td class="fw-bold tabular-nums" th:text="'#' + ${log.id}">#1</td>
+                        <td class="small tabular-nums" th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}">2026-08-29 12:00:00</td>
+                        <td class="fw-bold text-dark" th:text="${log.userEmail != null ? log.userEmail : 'SYSTEM'}">admin@islandtrails.lk</td>
+                        <td>
+                            <span class="badge" th:classappend="${log.action == 'LOGIN' ? 'badge-subtle-info' : (log.action == 'ROLE_CHANGE' ? 'badge-subtle-warning' : (log.action == 'ACCOUNT_DEACTIVATED' ? 'badge-subtle-danger' : 'badge-subtle-neutral'))}" th:text="${log.action}">LOGIN</span>
+                        </td>
+                        <td class="small" th:text="${log.delta}">Details description...</td>
+                        <td class="small text-muted tabular-nums" th:text="${log.ipAddress != null ? log.ipAddress : '-'}">127.0.0.1</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

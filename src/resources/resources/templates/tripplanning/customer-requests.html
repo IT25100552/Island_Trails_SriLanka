@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>My Custom Trip Inquiries - Island Trails Lanka</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold mb-1">My Custom Trip Inquiries</h1>
+            <p class="text-muted small">Track quotations prepared by our travel consultants for your tailor-made itineraries</p>
+        </div>
+        <a th:href="@{/customer/trip-request/new}" class="btn btn-warning fw-bold">
+            <i class="bi bi-plus-circle me-1"></i> New Trip Request
+        </a>
+    </div>
+
+    <div class="card shadow-sm rounded-4 p-4 bg-white">
+        <div class="table-responsive" th:if="${not #lists.isEmpty(requests)}">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Request #</th>
+                        <th>Travel Dates</th>
+                        <th>Pax</th>
+                        <th>Target Budget</th>
+                        <th>Interests</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="r : ${requests}">
+                        <td class="fw-bold tabular-nums" th:text="'#' + ${r.id}">#1</td>
+                        <td class="tabular-nums" th:text="${r.startDate} + ' to ' + ${r.endDate}">2026-09-01 to 2026-09-08</td>
+                        <td class="tabular-nums" th:text="${r.numberOfTravelers} + ' Pax'">2 Pax</td>
+                        <td class="fw-bold text-primary tabular-nums" th:text="'LKR ' + ${#numbers.formatDecimal(r.budget, 0, 'COMMA', 2, 'POINT')}">LKR 250,000</td>
+                        <td class="small text-muted" th:text="${r.interests}">wildlife, heritage</td>
+                        <td>
+                            <span class="badge" th:classappend="${r.status.name() == 'QUOTED' ? 'badge-subtle-info' : (r.status.name() == 'ACCEPTED' ? 'badge-subtle-success' : (r.status.name() == 'CONVERTED_TO_BOOKING' ? 'badge-subtle-info' : 'badge-subtle-neutral'))}" th:text="${r.status}">SUBMITTED</span>
+                        </td>
+                        <td>
+                            <a th:if="${r.status.name() == 'QUOTED' || r.status.name() == 'ACCEPTED' || r.status.name() == 'CONVERTED_TO_BOOKING'}"
+                               th:href="@{/customer/quotation/{id}(id=${r.id})}" class="btn btn-warning btn-sm fw-bold">
+                                View Quotation &rarr;
+                            </a>
+                            <span th:if="${r.status.name() == 'SUBMITTED' || r.status.name() == 'UNDER_REVIEW'}" class="text-muted small italic">Under review</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${#lists.isEmpty(requests)}" class="text-center py-5 text-muted">
+            <i class="bi bi-map display-4 mb-2"></i>
+            <h2 class="h5">No custom trip requests yet</h2>
+            <p>Looking for a personalized vacation? Let our experts build a custom itinerary.</p>
+            <a th:href="@{/customer/trip-request/new}" class="btn btn-warning fw-bold">Create Custom Trip Request</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

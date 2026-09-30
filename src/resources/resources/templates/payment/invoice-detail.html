@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title th:text="'Tax Invoice ' + ${invoice.invoiceNumber} + ' - Island Trails Lanka'">Official Tax Invoice</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+        <a th:href="@{/customer/dashboard}" class="btn btn-outline-secondary">&larr; Back to Dashboard</a>
+        <button onclick="window.print()" class="btn btn-primary fw-bold">
+            <i class="bi bi-printer me-1"></i> Print Digital Invoice
+        </button>
+    </div>
+
+    <div class="card shadow-sm rounded-4 p-5 bg-white mx-auto" style="max-width: 850px;">
+        <div class="d-flex justify-content-between align-items-start border-bottom pb-4 mb-4">
+            <div>
+                <h1 class="h3 fw-bold text-primary mb-1"><i class="bi bi-compass-fill text-warning me-2"></i> Island Trails Lanka (Pvt) Ltd</h1>
+                <p class="text-muted small mb-0">No. 45, Galle Road, Colombo 03, Sri Lanka</p>
+                <p class="text-muted small mb-0">Reg # PV-102948 | VAT # 10294857-7000</p>
+            </div>
+            <div class="text-end">
+                <span class="badge badge-subtle-success fs-6 px-3 py-2 mb-2" th:text="${invoice.status}">PAID</span>
+                <h2 class="h5 fw-bold text-dark mb-0 tabular-nums" th:text="${invoice.invoiceNumber}">INV-2026-0001</h2>
+                <span class="text-muted small tabular-nums" th:text="'Issue Date: ' + ${invoice.issueDate}">Date</span>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <h3 class="text-muted small fw-bold text-uppercase mb-1">Billed To:</h3>
+                <div class="fw-bold text-dark fs-6" th:text="${booking.customerName}">Customer Name</div>
+                <div class="small text-muted tabular-nums" th:text="'Booking Reference: #' + ${booking.id}">Booking #1</div>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <h3 class="text-muted small fw-bold text-uppercase mb-1">Tour Details:</h3>
+                <div class="fw-bold text-dark" th:text="${booking.packageName}">Package Name</div>
+                <div class="small text-muted tabular-nums" th:text="${booking.startDate} + ' to ' + ${booking.endDate}">Dates</div>
+                <div class="small text-muted tabular-nums" th:text="${booking.numberOfTravelers} + ' Traveler(s)'">Travelers</div>
+            </div>
+        </div>
+
+        <div class="table-responsive mb-4">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Description</th>
+                        <th class="text-center">Travelers</th>
+                        <th class="text-end">Total Amount (LKR)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="fw-bold" th:text="${booking.packageName}">Tour Package Description</div>
+                            <small class="text-muted">Comprehensive transport, chauffeur guide services, and lodging</small>
+                        </td>
+                        <td class="text-center tabular-nums" th:text="${booking.numberOfTravelers}">2</td>
+                        <td class="text-end fw-bold tabular-nums" th:text="'LKR ' + ${#numbers.formatDecimal(invoice.totalAmount, 0, 'COMMA', 2, 'POINT')}">LKR 150,000.00</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="2" class="text-end">Total Paid:</th>
+                        <th class="text-end text-primary fs-5 tabular-nums" th:text="'LKR ' + ${#numbers.formatDecimal(invoice.totalAmount, 0, 'COMMA', 2, 'POINT')}">LKR 150,000.00</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="p-3 bg-light rounded-3 small text-muted">
+            <div class="fw-bold text-dark mb-1">Receipt Verification:</div>
+            <div>Transaction ID: <span class="text-dark font-monospace" th:text="${payment != null ? payment.transactionId : 'N/A'}">TXN-001</span></div>
+            <div>This is an electronically generated valid digital invoice from Island Trails Lanka (Pvt) Ltd.</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

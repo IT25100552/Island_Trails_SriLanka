@@ -1,0 +1,30 @@
+
+spring:
+  datasource:
+    url: jdbc:sqlserver://localhost:1433;databaseName=IslandTrail;trustServerCertificate=true;encrypt=false
+    username: sa
+    password: IT25100552
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 10
+
+---
+# H2 Fallback Profile (run with --spring.profiles.active=h2 for machines without MSSQL)
+spring:
+  config:
+    activate:
+      on-profile: h2
+  datasource:
+    url: jdbc:h2:mem:islandtrails;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: update

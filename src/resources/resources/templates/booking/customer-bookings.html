@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>My Tour Bookings - Island Trails Lanka</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold mb-1 text-dark">My Bookings History</h1>
+            <p class="text-muted small">View all your upcoming tours, completed itineraries, and submit reviews</p>
+        </div>
+        <a th:href="@{/catalog/search}" class="btn btn-primary fw-bold">
+            <i class="bi bi-compass me-1"></i> Browse More Tours
+        </a>
+    </div>
+
+    <div class="card p-4">
+        <div class="table-responsive" th:if="${not #lists.isEmpty(bookings)}">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Booking #</th>
+                        <th>Tour Package</th>
+                        <th>Travel Dates</th>
+                        <th>Group Size</th>
+                        <th>Total Cost</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="b : ${bookings}">
+                        <td class="fw-bold tabular-nums" th:text="'#' + ${b.id}">#1</td>
+                        <td>
+                            <div class="fw-bold" th:text="${b.packageName}">Package Name</div>
+                            <small class="text-muted tabular-nums" th:text="${#temporals.format(b.createdAt, 'yyyy-MM-dd')}">2026-08-29</small>
+                        </td>
+                        <td class="tabular-nums" th:text="${b.startDate} + ' to ' + ${b.endDate}">2026-09-01 to 2026-09-05</td>
+                        <td class="tabular-nums" th:text="${b.numberOfTravelers} + ' Travelers'">2 Travelers</td>
+                        <td class="fw-bold text-primary tabular-nums" th:text="'LKR ' + ${#numbers.formatDecimal(b.totalPrice, 0, 'COMMA', 2, 'POINT')}">LKR 150,000</td>
+                        <td>
+                            <span class="badge" th:classappend="${b.status.name() == 'CONFIRMED' ? 'badge-subtle-success' : (b.status.name() == 'PENDING_PAYMENT' ? 'badge-subtle-warning' : (b.status.name() == 'CANCELLED' ? 'badge-subtle-danger' : 'badge-subtle-neutral'))}" th:text="${b.status}">CONFIRMED</span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1 flex-wrap">
+                                <a th:href="@{/customer/booking/{id}(id=${b.id})}" class="btn btn-outline-dark btn-sm">Details</a>
+                                <a th:if="${b.status.name() == 'PENDING_PAYMENT'}" th:href="@{/customer/booking/{id}/payment(id=${b.id})}" class="btn btn-warning btn-sm fw-bold">Pay Now</a>
+
+                                <!-- Review modal trigger if confirmed/completed -->
+                                <button th:if="${b.status.name() == 'CONFIRMED' || b.status.name() == 'COMPLETED'}" type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" th:data-bs-target="'#reviewModal' + ${b.id}">
+                                    ★ Review
+                                </button>
+                            </div>
+
+                            <!-- Review Modal -->
+                            <div th:if="${b.status.name() == 'CONFIRMED' || b.status.name() == 'COMPLETED'}" class="modal fade" th:id="'reviewModal' + ${b.id}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content rounded-4 shadow">
+                                        <div class="modal-header border-bottom">
+                                            <h2 class="h5 modal-title fw-bold text-dark">Rate Your Tour Experience</h2>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form th:action="@{/customer/review/new}" method="post">
+                                            <div class="modal-body">
+                                                <input type="hidden" name="bookingId" th:value="${b.id}">
+                                                <input type="hidden" name="packageId" th:value="${b.packageId}">
+
+                                                <div class="mb-3">
+                                                    <label class="form-label small fw-bold">Rating (1 to 5 Stars)</label>
+                                                    <select name="rating" class="form-select" required>
+                                                        <option value="5">★★★★★ (5 Stars - Excellent)</option>
+                                                        <option value="4">★★★★☆ (4 Stars - Very Good)</option>
+                                                        <option value="3">★★★☆☆ (3 Stars - Average)</option>
+                                                        <option value="2">★★☆☆☆ (2 Stars - Poor)</option>
+                                                        <option value="1">★☆☆☆☆ (1 Star - Terrible)</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label small fw-bold">Your Feedback</label>
+                                                    <textarea name="comment" class="form-control" rows="3" placeholder="Share highlights about your guide, transport, and sites..." required maxlength="2000"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer border-0">
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-warning btn-sm fw-bold">Submit Review</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${#lists.isEmpty(bookings)}" class="text-center py-5 text-muted">
+            <i class="bi bi-calendar-x display-4 mb-2 opacity-50"></i>
+            <h2 class="h5 fw-bold text-dark">No bookings placed yet</h2>
+            <p>Ready for your tropical adventure? Explore our catalog of verified Sri Lanka tour packages.</p>
+            <a th:href="@{/catalog/search}" class="btn btn-primary fw-bold">Explore Tour Packages</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

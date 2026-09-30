@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Resource Inventory - Island Trails Lanka</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <span class="badge bg-success px-3 py-2 rounded-pill fw-bold mb-2">Tour Operations</span>
+            <h2 class="fw-bold mb-1">Resource Inventory</h2>
+            <p class="text-muted small">Manage vehicles, tour guides, hotel room allocations, and activity reservations</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/staff/tour-ops/calendar}" class="btn btn-outline-primary fw-bold"><i class="bi bi-calendar3 me-1"></i> Availability Calendar</a>
+            <a th:href="@{/staff/tour-ops/resource/new}" class="btn btn-warning fw-bold"><i class="bi bi-plus-circle me-1"></i> Add Resource</a>
+        </div>
+    </div>
+
+    <!-- Resource Type Filter Pills -->
+    <div class="d-flex gap-2 mb-4 flex-wrap">
+        <a th:href="@{/staff/tour-ops/resources}" class="btn btn-sm" th:classappend="${currentType == null ? 'btn-primary' : 'btn-outline-secondary'}">All Resources</a>
+        <a th:each="t : ${resourceTypes}" th:href="@{/staff/tour-ops/resources(type=${t})}" class="btn btn-sm"
+           th:classappend="${currentType == t ? 'btn-primary' : 'btn-outline-secondary'}" th:text="${t}">VEHICLE</a>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4 p-4 bg-white">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Resource Name</th>
+                        <th>Type Specific Details</th>
+                        <th>Daily / Unit Cost</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="r : ${resources}">
+                        <td class="fw-bold" th:text="'#' + ${r.id}">#1</td>
+                        <td>
+                            <span class="badge" th:classappend="${r.resourceType.name() == 'VEHICLE' ? 'bg-info text-dark' : (r.resourceType.name() == 'GUIDE' ? 'bg-primary' : (r.resourceType.name() == 'HOTEL_ROOM' ? 'bg-warning text-dark' : 'bg-success'))}" th:text="${r.resourceType}">TYPE</span>
+                        </td>
+                        <td class="fw-bold" th:text="${r.name}">Resource Name</td>
+                        <td class="small text-muted">
+                            <div th:if="${r.resourceType.name() == 'VEHICLE'}">
+                                Plate: <span class="fw-bold text-dark" th:text="${r.plateNumber}">WP-CAB-1234</span> | Seats: <span th:text="${r.seatCapacity}">9</span> (<span th:text="${r.vehicleModel}">Model</span>)
+                            </div>
+                            <div th:if="${r.resourceType.name() == 'GUIDE'}">
+                                Languages: <span class="fw-bold text-dark" th:text="${r.languages}">English</span> | Cert: <span th:text="${r.certification}">SLTDA</span>
+                            </div>
+                            <div th:if="${r.resourceType.name() == 'HOTEL_ROOM'}">
+                                Hotel: <span class="fw-bold text-dark" th:text="${r.hotelName}">Heritance</span> | Room: <span th:text="${r.roomNumber}">204</span> | Beds: <span th:text="${r.bedCapacity}">2</span>
+                            </div>
+                            <div th:if="${r.resourceType.name() == 'ACTIVITY'}">
+                                General Guided Activity
+                            </div>
+                        </td>
+                        <td class="fw-bold text-primary" th:text="'LKR ' + ${#numbers.formatDecimal(r.unitCost, 0, 'COMMA', 2, 'POINT')}">LKR 18,000</td>
+                        <td>
+                            <span class="badge" th:classappend="${r.status.name() == 'ACTIVE' ? 'bg-success' : 'bg-danger'}" th:text="${r.status}">ACTIVE</span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a th:href="@{/staff/tour-ops/resource/{id}/edit(id=${r.id})}" class="btn btn-outline-primary btn-sm">Edit</a>
+                                <form th:if="${r.status.name() == 'ACTIVE'}" th:action="@{/staff/tour-ops/resource/{id}/deactivate(id=${r.id})}" method="post">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Mark this resource as INACTIVE?')">Deactivate</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

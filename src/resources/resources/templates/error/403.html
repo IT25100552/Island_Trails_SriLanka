@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>403 Access Denied - Island Trails Lanka</title>
+</head>
+<body>
+<div th:fragment="content" class="row justify-content-center py-5">
+    <div class="col-md-7 text-center">
+        <div class="card shadow-sm rounded-4 p-5 bg-white">
+            <i class="bi bi-shield-x text-warning display-1 mb-3"></i>
+            <h1 class="h2 fw-bold text-dark mb-2">403 &middot; Access Denied</h1>
+            <p class="lead text-muted mb-4">You do not have the required role authorizations to access this internal portal.</p>
+            <div>
+                <a th:href="@{/dashboard}" class="btn btn-warning fw-bold px-4">Go to My Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

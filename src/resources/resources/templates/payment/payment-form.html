@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Simulated Payment Checkout - Island Trails Lanka</title>
+</head>
+<body>
+<div th:fragment="content" class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card p-4 p-md-5">
+            <div class="mb-4">
+                <h1 class="h2 fw-bold text-dark mb-1">Payment Verification</h1>
+                <p class="text-muted small mb-0"><i class="bi bi-shield-check text-success me-1"></i> 256-Bit SSL Secure Checkout &middot; Complete payment to confirm your tour booking.</p>
+            </div>
+
+            <!-- Booking Order Summary -->
+            <div class="p-3 bg-light rounded-3 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <h2 class="h6 fw-bold text-dark mb-0" th:text="${booking.packageName}">Tour Name</h2>
+                    <span class="badge badge-subtle-neutral tabular-nums" th:text="'Reservation #' + ${booking.id}">#1</span>
+                </div>
+                <div class="small text-muted mb-2 tabular-nums" th:text="${booking.startDate} + ' to ' + ${booking.endDate} + ' (' + ${booking.numberOfTravelers} + ' travelers)'">Dates</div>
+                <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                    <span class="fw-bold text-dark">Total Amount Due:</span>
+                    <span class="fs-4 fw-bold text-primary tabular-nums" th:text="'LKR ' + ${#numbers.formatDecimal(booking.totalPrice, 0, 'COMMA', 2, 'POINT')}">LKR 150,000</span>
+                </div>
+            </div>
+
+            <form th:action="@{/customer/booking/{id}/payment(id=${booking.id})}" th:object="${paymentDTO}" method="post">
+                <input type="hidden" th:field="*{bookingId}">
+
+                <div class="mb-3">
+                    <label for="payment-method" class="form-label fw-semibold">Payment Method</label>
+                    <select id="payment-method" th:field="*{method}" class="form-select form-select-lg">
+                        <option th:each="m : ${paymentMethods}" th:value="${m}" th:text="${m}"></option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="payment-card" class="form-label fw-semibold">Card / Account Number</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-credit-card"></i></span>
+                        <input type="text" id="payment-card" th:field="*{cardNumber}" class="form-control form-control-lg tabular-nums"
+                               th:classappend="${#fields.hasErrors('cardNumber')} ? 'is-invalid' : ''"
+                               placeholder="4532 0000 1234 5678" required maxlength="30">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('cardNumber')}" th:errors="*{cardNumber}"></div>
+                    </div>
+                    <small class="text-muted"><i class="bi bi-shield-check text-success me-1"></i> Sandbox Test Gateway: Any valid 16-digit card number is accepted.</small>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="payment-expiry" class="form-label fw-semibold">Expiry Date</label>
+                        <input type="text" id="payment-expiry" th:field="*{cardExpiry}" class="form-control tabular-nums"
+                               th:classappend="${#fields.hasErrors('cardExpiry')} ? 'is-invalid' : ''"
+                               placeholder="MM/YY" required maxlength="10">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('cardExpiry')}" th:errors="*{cardExpiry}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="payment-cvv" class="form-label fw-semibold">CVV Security Code</label>
+                        <input type="password" id="payment-cvv" th:field="*{cardCvv}" class="form-control tabular-nums"
+                               th:classappend="${#fields.hasErrors('cardCvv')} ? 'is-invalid' : ''"
+                               placeholder="•••" required minlength="3" maxlength="4">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('cardCvv')}" th:errors="*{cardCvv}"></div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                    <a th:href="@{/customer/booking/{id}(id=${booking.id})}" class="btn btn-outline-secondary">&larr; Back</a>
+                    <button type="submit" class="btn btn-warning btn-lg fw-bold px-4 shadow-sm">
+                        <i class="bi bi-shield-lock-fill me-2"></i> Pay & Confirm Reservation
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

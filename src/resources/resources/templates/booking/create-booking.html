@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Book Tour Package - Island Trails Lanka</title>
+</head>
+<body>
+<div th:fragment="content" class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card p-4 p-md-5">
+            <div class="mb-4">
+                <h1 class="h2 fw-bold text-dark mb-1">Reserve Your Tour</h1>
+                <p class="text-muted small mb-0">Step 1 of 2 &middot; Select your departure date and party size to lock in your Ceylon adventure.</p>
+            </div>
+
+            <!-- Tour summary card -->
+            <div class="p-3 bg-light rounded-3 mb-4 d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="h5 fw-bold text-dark mb-1" th:text="${pkg.name}">Tour Name</h2>
+                    <span class="text-muted small" th:text="${pkg.destination}">Destination</span>
+                    <span class="text-muted small">·</span>
+                    <span class="badge badge-subtle-neutral px-2 py-1 rounded-pill small tabular-nums">
+                        <i class="bi bi-clock text-primary me-1"></i> <span id="durationDays" th:text="${pkg.durationDays}">4</span> Days
+                    </span>
+                </div>
+                <div class="text-end">
+                    <span class="text-muted small d-block">Base Price</span>
+                    <span class="fw-bold text-primary fs-5 tabular-nums" id="basePriceDisplay" th:text="'LKR ' + ${#numbers.formatDecimal(pkg.basePrice, 0, 'COMMA', 2, 'POINT')}">LKR 75,000</span>
+                    <input type="hidden" id="basePriceRaw" th:value="${pkg.basePrice}">
+                </div>
+            </div>
+
+            <form th:action="@{/customer/booking}" th:object="${bookingDTO}" method="post" id="bookingForm">
+                <input type="hidden" th:field="*{packageId}">
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="startDateInput" class="form-label fw-semibold">Tour Start Date</label>
+                        <input type="date" th:field="*{startDate}" id="startDateInput" class="form-control form-control-lg"
+                               th:classappend="${#fields.hasErrors('startDate')} ? 'is-invalid' : ''"
+                               th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" required>
+                        <small class="text-muted">Select your planned departure date</small>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="endDateInput" class="form-label fw-semibold">Tour Return Date (Calculated)</label>
+                        <input type="date" th:field="*{endDate}" id="endDateInput" class="form-control form-control-lg bg-light"
+                               th:classappend="${#fields.hasErrors('endDate')} ? 'is-invalid' : ''"
+                               th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" required readonly>
+                        <small class="text-muted">Auto-computed for <span class="tabular-nums" th:text="${pkg.durationDays}">4</span> days itinerary</small>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('endDate')}" th:errors="*{endDate}"></div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="travelersInput" class="form-label fw-semibold">Number of Travelers</label>
+                    <input type="number" th:field="*{numberOfTravelers}" id="travelersInput" class="form-control form-control-lg tabular-nums"
+                           th:classappend="${#fields.hasErrors('numberOfTravelers')} ? 'is-invalid' : ''"
+                           min="1" max="50" required value="1">
+                    <small class="text-muted">Includes adults and children occupying a bed</small>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('numberOfTravelers')}" th:errors="*{numberOfTravelers}"></div>
+                </div>
+
+                <!-- Real-time Cost Breakdown -->
+                <div class="p-3 bg-light rounded-3 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-muted small">Estimated Total (<span id="travelerCountDisplay">1</span> traveler(s) &times; Base Rate):</span>
+                        <span class="fw-bold text-dark fs-5" id="totalPriceDisplay">LKR 0.00</span>
+                    </div>
+                    <div class="text-muted small">
+                        <i class="bi bi-info-circle me-1 text-primary"></i> Guaranteed rates with 100% refund protection prior to reservation confirmation.
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Special Dietary / Accommodation Requests (Optional)</label>
+                    <textarea th:field="*{specialRequests}" class="form-control" rows="3"
+                              th:classappend="${#fields.hasErrors('specialRequests')} ? 'is-invalid' : ''"
+                              maxlength="1000" placeholder="e.g. Vegetarian/Halal meals, adjoining family rooms, airport pickup..."></textarea>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('specialRequests')}" th:errors="*{specialRequests}"></div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                    <a th:href="@{/catalog/package/{id}(id=${pkg.id})}" class="btn btn-outline-secondary">
+                        &larr; Back to Package
+                    </a>
+                    <button type="submit" class="btn btn-warning btn-lg fw-bold px-4 shadow-sm">
+                        <i class="bi bi-calendar-check me-2"></i> Confirm Reservation &rarr;
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Live Date and Price Calculation Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startDateInput = document.getElementById('startDateInput');
+            const endDateInput = document.getElementById('endDateInput');
+            const durationDays = parseInt(document.getElementById('durationDays').innerText, 10) || 1;
+            const travelersInput = document.getElementById('travelersInput');
+            const travelerCountDisplay = document.getElementById('travelerCountDisplay');
+            const basePrice = parseFloat(document.getElementById('basePriceRaw').value) || 0;
+            const totalPriceDisplay = document.getElementById('totalPriceDisplay');
+
+            function updateEndDate() {
+                if (startDateInput.value) {
+                    const date = new Date(startDateInput.value);
+                    date.setDate(date.getDate() + (durationDays - 1));
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    endDateInput.value = `${year}-${month}-${day}`;
+                }
+            }
+
+            function updatePrice() {
+                const count = Math.max(1, parseInt(travelersInput.value, 10) || 1);
+                if (travelerCountDisplay) travelerCountDisplay.innerText = count;
+                const total = count * basePrice;
+                if (totalPriceDisplay) {
+                    totalPriceDisplay.innerText = 'LKR ' + total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                }
+            }
+
+            if (startDateInput) {
+                startDateInput.addEventListener('change', updateEndDate);
+            }
+            if (travelersInput) {
+                travelersInput.addEventListener('input', updatePrice);
+            }
+
+            updatePrice();
+            if (startDateInput && startDateInput.value) {
+                updateEndDate();
+            }
+        });
+    </script>
+</div>
+</body>
+</html>

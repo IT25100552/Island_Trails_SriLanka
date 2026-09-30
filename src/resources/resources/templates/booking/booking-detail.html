@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title th:text="'Booking #' + ${booking.id} + ' - Island Trails Lanka'">Booking Details</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold mb-1 text-dark">
+                Reservation Summary <span class="text-muted fw-normal fs-4 tabular-nums" th:text="'#' + ${booking.id}">#1</span>
+            </h1>
+            <p class="text-muted small mb-0">Travel dates, payment verification, and reservation status</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/customer/bookings}" class="btn btn-outline-secondary">My Bookings</a>
+            <a th:if="${booking.status.name() == 'PENDING_PAYMENT'}" th:href="@{/customer/booking/{id}/payment(id=${booking.id})}" class="btn btn-warning fw-bold">
+                <i class="bi bi-credit-card me-1"></i> Proceed to Payment
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Main Details -->
+        <div class="col-lg-8">
+            <div class="card p-4 p-md-5 mb-4">
+                <div class="d-flex justify-content-between align-items-start mb-4 pb-3 border-bottom">
+                    <div>
+                        <h2 class="h4 fw-bold text-dark mb-1" th:text="${booking.packageName}">Tour Name</h2>
+                        <span class="text-muted small" th:text="${pkg.destination}">Destination</span>
+                    </div>
+                    <span class="badge px-3 py-2 rounded-pill"
+                          th:classappend="${booking.status.name() == 'CONFIRMED' ? 'badge-subtle-success' : (booking.status.name() == 'PENDING_PAYMENT' ? 'badge-subtle-warning' : (booking.status.name() == 'CANCELLED' ? 'badge-subtle-danger' : 'badge-subtle-neutral'))}"
+                          th:text="${booking.status}">CONFIRMED</span>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="text-muted small">Travel Dates</div>
+                        <div class="fw-bold fs-6 tabular-nums" th:text="${booking.startDate} + ' to ' + ${booking.endDate}">2026-09-01 to 2026-09-05</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-muted small">Travelers</div>
+                        <div class="fw-bold fs-6 tabular-nums" th:text="${booking.numberOfTravelers} + ' Person(s)'">2 Persons</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-muted small">Booking Date</div>
+                        <div class="fw-bold fs-6 tabular-nums" th:text="${booking.bookingDate}">2026-08-29</div>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-light rounded-3 mb-4" th:if="${booking.specialRequests != null && !#strings.isEmpty(booking.specialRequests)}">
+                    <div class="text-muted small fw-bold mb-1">Special Requests</div>
+                    <div class="text-dark small" th:text="${booking.specialRequests}">Special requests...</div>
+                </div>
+
+                <!-- Modification Form (Allowed before payment/confirmation) -->
+                <div th:if="${booking.status.name() == 'PENDING_PAYMENT' || booking.status.name() == 'CONFIRMED'}" class="p-3 bg-light rounded-3 mb-3">
+                    <h3 class="h6 fw-bold mb-3 text-dark"><i class="bi bi-pencil me-1"></i> Modify Travel Details</h3>
+                    <form th:action="@{/customer/booking/{id}/modify(id=${booking.id})}" method="post" class="row g-2 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label small text-muted">New Start Date</label>
+                            <input type="date" name="startDate" th:value="${booking.startDate}" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small text-muted">New End Date</label>
+                            <input type="date" name="endDate" th:value="${booking.endDate}" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small text-muted">Travelers</label>
+                            <input type="number" name="numberOfTravelers" th:value="${booking.numberOfTravelers}" class="form-control form-control-sm" min="1" required>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-outline-brand btn-sm w-100 fw-bold">Update</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Cancel Booking Option -->
+                <div th:if="${booking.status.name() == 'PENDING_PAYMENT'}" class="pt-3 border-top text-end">
+                    <form th:action="@{/customer/booking/{id}/cancel(id=${booking.id})}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Cancel this booking?')">Cancel Booking</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment & Refund Sidebar -->
+        <div class="col-lg-4">
+            <div class="card p-4 mb-4">
+                <h2 class="h6 text-muted fw-bold text-uppercase mb-1">Total Amount</h2>
+                <p class="h2 fw-bold text-primary mb-3 tabular-nums" th:text="'LKR ' + ${#numbers.formatDecimal(booking.totalPrice, 0, 'COMMA', 2, 'POINT')}">LKR 150,000</p>
+
+                <div th:if="${payment != null}">
+                    <div class="p-3 bg-success bg-opacity-10 text-success rounded-3 mb-3 small">
+                        <div><i class="bi bi-check-circle-fill me-1"></i> <strong>Payment Verified</strong></div>
+                        <div class="mt-1">Txn ID: <code th:text="${payment.transactionId}">TXN-001</code></div>
+                    </div>
+
+                    <a th:href="@{/customer/refund/request(bookingId=${booking.id})}" class="btn btn-outline-danger btn-sm w-100 mb-2">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i> Request 100% Refund
+                    </a>
+                </div>
+
+                <div th:if="${payment == null && booking.status.name() == 'PENDING_PAYMENT'}">
+                    <a th:href="@{/customer/booking/{id}/payment(id=${booking.id})}" class="btn btn-warning btn-lg w-100 fw-bold mb-2 shadow-sm">
+                        <i class="bi bi-credit-card me-2"></i> Proceed to Checkout &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>IT Systems Administration - Island Trails Lanka</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold mb-1">System Overview & Management</h1>
+            <p class="text-muted small mb-0">Manage staff accounts, role authorizations, audit trails, and global system configuration</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/admin/user/new}" class="btn btn-warning fw-bold"><i class="bi bi-person-plus me-1"></i> New Staff Account</a>
+            <a th:href="@{/admin/settings}" class="btn btn-outline-dark fw-bold"><i class="bi bi-sliders me-1"></i> Global Settings</a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4 col-lg-2">
+            <div class="card p-3 bg-white stat-card">
+                <div class="text-muted small fw-bold">Total Users</div>
+                <div class="fs-3 fw-bold text-dark mt-1 tabular-nums" th:text="${totalUsers}">7</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="card p-3 bg-white stat-card-warning">
+                <div class="text-muted small fw-bold">Tour Packages</div>
+                <div class="fs-3 fw-bold text-dark mt-1 tabular-nums" th:text="${totalPackages}">4</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="card p-3 bg-white stat-card">
+                <div class="text-muted small fw-bold">Total Bookings</div>
+                <div class="fs-3 fw-bold text-dark mt-1 tabular-nums" th:text="${totalBookings}">1</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <div class="card p-3 bg-white stat-card-warning">
+                <div class="text-muted small fw-bold">Payment Records</div>
+                <div class="fs-3 fw-bold text-dark mt-1 tabular-nums" th:text="${totalPayments}">1</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <div class="card p-3 bg-white stat-card">
+                <div class="text-muted small fw-bold">Support Tickets</div>
+                <div class="fs-3 fw-bold text-dark mt-1 tabular-nums" th:text="${totalTickets}">2</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Navigation Panels -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm rounded-4 p-4 bg-white h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h5 fw-bold mb-0"><i class="bi bi-people-fill text-primary me-2"></i> User & Staff Accounts</h2>
+                    <a th:href="@{/admin/users}" class="btn btn-outline-primary btn-sm">Manage All &rarr;</a>
+                </div>
+                <p class="text-muted small">Create new staff accounts, assign 6 specific roles, adjust permissions, or deactivate/reactivate accounts (soft-delete policy).</p>
+                <div class="mt-auto">
+                    <a th:href="@{/admin/user/new}" class="btn btn-primary btn-sm fw-bold">Create Staff Account</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm rounded-4 p-4 bg-white h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h5 fw-bold mb-0"><i class="bi bi-journal-text text-warning me-2"></i> Security Audit Trail</h2>
+                    <a th:href="@{/admin/audit-log}" class="btn btn-outline-warning btn-sm">View Full Log &rarr;</a>
+                </div>
+                <p class="text-muted small">Immutable chronological audit log capturing logins, logouts, role changes, deactivations, and config modifications with IP addresses.</p>
+                <div class="mt-auto">
+                    <a th:href="@{/admin/audit-log}" class="btn btn-outline-dark btn-sm fw-bold">Open Audit Log</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Audit Activity -->
+    <div class="card shadow-sm rounded-4 p-4 bg-white">
+        <h2 class="h5 fw-bold mb-3"><i class="bi bi-activity text-danger me-2"></i> Recent System Actions</h2>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle small">
+                <thead class="table-light">
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Delta Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="log : ${recentLogs}">
+                        <td class="tabular-nums" th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}">2026-08-29 12:00</td>
+                        <td class="fw-bold" th:text="${log.userEmail != null ? log.userEmail : 'SYSTEM'}">user@example.com</td>
+                        <td><span class="badge badge-subtle-neutral" th:text="${log.action}">LOGIN</span></td>
+                        <td th:text="${log.delta}">Details</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

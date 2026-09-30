@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Log In - Island Trails Lanka</title>
+</head>
+<body>
+<div th:fragment="content" class="row justify-content-center py-4">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm rounded-4 p-4 p-md-5 bg-white">
+            <div class="text-center mb-4">
+                <i class="bi bi-compass display-4 text-warning"></i>
+                <h2 class="h3 fw-bold mt-2 text-dark">Welcome Back</h2>
+                <p class="text-muted small">Log in to your Island Trails Lanka account</p>
+            </div>
+
+            <form th:action="@{/auth/login}" method="post">
+                <div class="mb-3">
+                    <label for="login-email" class="form-label fw-semibold">Email Address</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                        <input type="email" id="login-email" name="username" class="form-control" placeholder="name@example.com" required autofocus>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <label for="login-password" class="form-label fw-semibold">Password</label>
+                        <a th:href="@{/auth/password-reset}" class="small text-decoration-none text-muted">Forgot password?</a>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                        <input type="password" id="login-password" name="password" class="form-control" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold mt-3">
+                    <i class="bi bi-box-arrow-in-right me-2"></i> Log In
+                </button>
+            </form>
+
+            <div class="text-center mt-4 pt-3 border-top">
+                <p class="text-muted small mb-0">Don't have an account? <a th:href="@{/auth/register}" class="text-primary fw-bold text-decoration-none">Create Account</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

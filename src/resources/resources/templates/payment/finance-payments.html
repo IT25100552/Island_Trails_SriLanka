@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Payment Transactions - Finance Officer</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold mb-1">Payment Transactions & Receipts</h1>
+            <p class="text-muted small mb-0">Monitor verified payments, declined attempts, and duplicate transaction alerts</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/staff/finance/refunds}" class="btn btn-outline-danger fw-bold"><i class="bi bi-arrow-counterclockwise me-1"></i> Refund Requests</a>
+            <a th:href="@{/staff/finance/reports}" class="btn btn-outline-dark fw-bold"><i class="bi bi-file-earmark-bar-graph me-1"></i> Reconciliation Report</a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm rounded-4 p-4 bg-white">
+        <div class="table-responsive" th:if="${not #lists.isEmpty(payments)}">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Payment #</th>
+                        <th>Booking #</th>
+                        <th>Transaction ID</th>
+                        <th>Method</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Processed At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="p : ${payments}">
+                        <td class="fw-bold tabular-nums" th:text="'#' + ${p.id}">#1</td>
+                        <td class="fw-bold tabular-nums" th:text="'#' + ${p.bookingId}">#1</td>
+                        <td><code class="text-dark tabular-nums" th:text="${p.transactionId}">TXN-001</code></td>
+                        <td><span class="badge badge-subtle-neutral" th:text="${p.method}">CREDIT_CARD</span></td>
+                        <td class="fw-bold text-primary tabular-nums" th:text="'LKR ' + ${#numbers.formatDecimal(p.amount, 0, 'COMMA', 2, 'POINT')}">LKR 150,000</td>
+                        <td>
+                            <span class="badge" th:classappend="${p.status.name() == 'VERIFIED' ? 'badge-subtle-success' : (p.status.name() == 'DUPLICATE_FLAGGED' ? 'badge-subtle-danger' : 'badge-subtle-warning')}" th:text="${p.status}">VERIFIED</span>
+                        </td>
+                        <td class="small text-muted tabular-nums" th:text="${p.processedAt != null ? #temporals.format(p.processedAt, 'yyyy-MM-dd HH:mm') : 'Pending'}">2026-08-29</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

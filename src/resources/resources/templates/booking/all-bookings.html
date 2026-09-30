@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>All Live Bookings - Tour Ops Manager</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <span class="badge bg-success px-3 py-2 rounded-pill fw-bold mb-2">Tour Operations</span>
+            <h2 class="fw-bold mb-1">Live Bookings & Resource Commitments</h2>
+            <p class="text-muted small">Monitor active bookings across all customers and resource allocations</p>
+        </div>
+        <a th:href="@{/staff/tour-ops/calendar}" class="btn btn-outline-primary fw-bold">
+            <i class="bi bi-calendar3 me-1"></i> Availability Calendar
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4 p-4 bg-white">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Booking #</th>
+                        <th>Customer</th>
+                        <th>Tour Package</th>
+                        <th>Travel Dates</th>
+                        <th>Travelers</th>
+                        <th>Total Cost</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="b : ${bookings}">
+                        <td class="fw-bold" th:text="'#' + ${b.id}">#1</td>
+                        <td>
+                            <div class="fw-bold text-dark" th:text="${b.customerName}">Customer Name</div>
+                            <small class="text-muted" th:text="'Customer ID: ' + ${b.customerId}">ID: 1</small>
+                        </td>
+                        <td th:text="${b.packageName}">Package Name</td>
+                        <td th:text="${b.startDate} + ' to ' + ${b.endDate}">2026-09-01 to 2026-09-05</td>
+                        <td th:text="${b.numberOfTravelers} + ' Pax'">2 Pax</td>
+                        <td class="fw-bold text-primary" th:text="'LKR ' + ${#numbers.formatDecimal(b.totalPrice, 0, 'COMMA', 2, 'POINT')}">LKR 150,000</td>
+                        <td>
+                            <span class="badge" th:classappend="${b.status.name() == 'CONFIRMED' ? 'bg-success' : (b.status.name() == 'PENDING_PAYMENT' ? 'bg-warning text-dark' : 'bg-secondary')}" th:text="${b.status}">CONFIRMED</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

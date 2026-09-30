@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Submit Support Ticket - Island Trails Lanka</title>
+</head>
+<body>
+<div th:fragment="content" class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm rounded-4 p-4 p-md-5 bg-white">
+            <div class="mb-4">
+                <h1 class="h2 fw-bold text-dark mb-1">Submit a Support Inquiry</h1>
+                <p class="text-muted small mb-0">Our automated routing connects your inquiry directly to the specialist team (Finance, Tour Operations, or Travel Consultants).</p>
+            </div>
+
+            <form th:action="@{/customer/support/ticket/new}" th:object="${ticketDTO}" method="post">
+                <div class="mb-3">
+                    <label for="ticket-subject" class="form-label fw-semibold">Subject / Summary</label>
+                    <input type="text" id="ticket-subject" th:field="*{subject}" class="form-control form-control-lg"
+                           th:classappend="${#fields.hasErrors('subject')} ? 'is-invalid' : ''"
+                           placeholder="e.g. Airport pickup time confirmation" required maxlength="150">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('subject')}" th:errors="*{subject}"></div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="ticket-category" class="form-label fw-semibold">Inquiry Category</label>
+                        <select id="ticket-category" th:field="*{category}" class="form-select"
+                                th:classappend="${#fields.hasErrors('category')} ? 'is-invalid' : ''" required>
+                            <option th:each="c : ${categories}" th:value="${c}" th:text="${c}"></option>
+                        </select>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></div>
+                        <small class="text-muted">Determines automated routing to specialist team.</small>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="ticket-inquiryType" class="form-label fw-semibold">Inquiry Type</label>
+                        <select id="ticket-inquiryType" th:field="*{inquiryType}" class="form-select"
+                                th:classappend="${#fields.hasErrors('inquiryType')} ? 'is-invalid' : ''" required>
+                            <option th:each="t : ${inquiryTypes}" th:value="${t}" th:text="${t}"></option>
+                        </select>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('inquiryType')}" th:errors="*{inquiryType}"></div>
+                        <small class="text-muted">Complaints receive HIGH priority response.</small>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Detailed Description</label>
+                    <textarea th:field="*{description}" class="form-control" rows="5"
+                              th:classappend="${#fields.hasErrors('description')} ? 'is-invalid' : ''"
+                              maxlength="2000" placeholder="Provide any booking IDs, travel dates, or specific questions so our staff can assist you promptly..." required></textarea>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                    <a th:href="@{/customer/support/tickets}" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary btn-lg fw-bold px-4">
+                        <i class="bi bi-send me-2"></i> Submit Ticket
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

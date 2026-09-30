@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title th:text="'Quotation v' + ${quotation.quotationVersion} + ' - Island Trails Lanka'">Quotation Proposal</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold mb-1">
+                Itinerary Quotation <span class="text-muted fw-normal fs-4 tabular-nums" th:text="'(Version ' + ${quotation.quotationVersion} + ')'">(Version 1)</span>
+            </h1>
+            <p class="text-muted small mb-0">Prepared by Travel Consultant: <strong th:text="${quotation.consultantName}">Consultant</strong></p>
+        </div>
+        <a th:href="@{/customer/trip-requests}" class="btn btn-outline-secondary">&larr; My Trip Inquiries</a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Quotation Breakdown -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm rounded-4 p-4 p-md-5 bg-white mb-4">
+                <div class="d-flex justify-content-between align-items-start mb-4 pb-3 border-bottom">
+                    <div>
+                        <h2 class="h4 fw-bold text-dark mb-1">Custom Sri Lanka Itinerary</h2>
+                        <span class="text-muted small tabular-nums" th:text="${tripRequest.startDate} + ' to ' + ${tripRequest.endDate}">Travel Dates</span>
+                    </div>
+                    <span class="badge px-3 py-2 rounded-pill"
+                          th:classappend="${quotation.status.name() == 'APPROVED' ? 'badge-subtle-success' : (quotation.status.name() == 'SENT' ? 'badge-subtle-info' : 'badge-subtle-neutral')}"
+                          th:text="${quotation.status}">SENT</span>
+                </div>
+
+                <div class="p-3 bg-light rounded-3 mb-4" th:if="${quotation.itineraryNotes != null}">
+                    <h3 class="h6 fw-bold text-primary mb-2"><i class="bi bi-card-text me-1"></i> Proposed Route & Notes:</h3>
+                    <p class="text-muted small mb-0" style="white-space: pre-line;" th:text="${quotation.itineraryNotes}">Notes...</p>
+                </div>
+
+                <h3 class="h5 fw-bold mb-3"><i class="bi bi-list-check text-primary me-2"></i> Itemized Resource Inclusions</h3>
+                <div class="table-responsive mb-4">
+                    <table class="table table-hover align-middle small">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Item / Resource</th>
+                                <th>Category</th>
+                                <th>Quantity / Days</th>
+                                <th>Rate (LKR)</th>
+                                <th>Line Cost (LKR)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="line, iter : ${quotation.lines}">
+                                <td class="tabular-nums" th:text="${iter.count}">1</td>
+                                <td class="fw-bold text-dark" th:text="${line.resourceName}">Resource</td>
+                                <td><span class="badge badge-subtle-neutral" th:text="${line.resourceType}">TYPE</span></td>
+                                <td class="tabular-nums" th:text="${line.quantity}">1</td>
+                                <td class="tabular-nums" th:text="'LKR ' + ${#numbers.formatDecimal(line.unitCost, 0, 'COMMA', 2, 'POINT')}">18,000</td>
+                                <td class="fw-bold tabular-nums" th:text="'LKR ' + ${#numbers.formatDecimal(line.lineCost, 0, 'COMMA', 2, 'POINT')}">18,000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Customer Action Buttons if SENT -->
+                <div th:if="${quotation.status.name() == 'SENT'}" class="d-flex justify-content-end gap-2 pt-3 border-top">
+                    <form th:action="@{/customer/quotation/{id}/reject(id=${quotation.id})}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Decline this quotation?')">Decline Quote</button>
+                    </form>
+                    <form th:action="@{/customer/quotation/{id}/accept(id=${quotation.id})}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-success fw-bold px-4">
+                            <i class="bi bi-check2-circle me-1"></i> Accept Quotation
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cost Summary Sidebar -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm rounded-4 p-4 bg-white sticky-top" style="top: 90px;">
+                <h2 class="h5 fw-bold mb-3"><i class="bi bi-receipt text-warning me-2"></i> Price Breakdown</h2>
+
+                <div class="d-flex justify-content-between mb-2 small text-muted">
+                    <span>Base Resource Subtotal:</span>
+                    <span class="fw-bold text-dark tabular-nums" th:text="'LKR ' + ${#numbers.formatDecimal(quotation.baseSubtotal, 0, 'COMMA', 2, 'POINT')}">100,000</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3 small text-muted">
+                    <span>Margin Factor Markup:</span>
+                    <span class="fw-bold text-dark tabular-nums" th:text="${quotation.profitMarginPercent} + '%'">15%</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="fw-bold">Total Proposal Cost:</span>
+                    <span class="fs-4 fw-bold text-primary tabular-nums" th:text="'LKR ' + ${#numbers.formatDecimal(quotation.totalCost, 0, 'COMMA', 2, 'POINT')}">115,000</span>
+                </div>
+
+                <div th:if="${quotation.status.name() == 'APPROVED'}" class="p-3 bg-success bg-opacity-10 text-success rounded-3 small">
+                    <i class="bi bi-check-circle-fill me-1"></i> <strong>Quotation Accepted!</strong> Awaiting final conversion to official booking by consultant.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
