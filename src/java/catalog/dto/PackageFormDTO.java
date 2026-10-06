@@ -5,37 +5,42 @@ import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 
+// Form data for creating or editing a tour package
 public class PackageFormDTO {
 
     private Long id;
 
-    @NotBlank(message = "Package name is required")
-    @Size(max = 150, message = "Package name cannot exceed 150 characters")
+    @NotBlank(message = "Required")
+    @Size(max = 150, message = "Max 150 characters")
     private String name;
 
-    @NotBlank(message = "Destination is required")
-    @Size(max = 100, message = "Destination cannot exceed 100 characters")
+    @NotBlank(message = "Required")
+    @Size(max = 100, message = "Max 100 characters")
     private String destination;
 
-    @NotBlank(message = "Description is required")
+    @NotBlank(message = "Required")
     private String description;
 
-    @NotNull(message = "Base price is required")
-    @Positive(message = "Base price must be greater than zero")
+    @NotNull(message = "Required")
+    @Positive(message = "Must be > 0")
     private BigDecimal basePrice;
 
-    @NotNull(message = "Duration in days is required")
-    @Min(value = 1, message = "Duration must be at least 1 day")
-    @Max(value = 60, message = "Duration cannot exceed 60 days")
+    @NotNull(message = "Required")
+    @Min(value = 1, message = "Min 1 day")
+    @Max(value = 60, message = "Max 60 days")
     private Integer durationDays;
 
-    private PackageStatus status = PackageStatus.DRAFT;
+    private String imageUrl;
+    private org.springframework.web.multipart.MultipartFile image;
+
+    private PackageStatus status = PackageStatus.PUBLISHED;
     private java.util.List<Long> resourceIds = new java.util.ArrayList<>();
     @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE)
     private java.time.LocalDate startDate;
     @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE)
     private java.time.LocalDate endDate;
 
+    // Getters and Setters
     public java.util.List<Long> getResourceIds() { return resourceIds; }
     public void setResourceIds(java.util.List<Long> resourceIds) { this.resourceIds = resourceIds; }
 
@@ -65,4 +70,10 @@ public class PackageFormDTO {
 
     public PackageStatus getStatus() { return status; }
     public void setStatus(PackageStatus status) { this.status = status; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public org.springframework.web.multipart.MultipartFile getImage() { return image; }
+    public void setImage(org.springframework.web.multipart.MultipartFile image) { this.image = image; }
 }

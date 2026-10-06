@@ -2,6 +2,7 @@ package com.islandtrails.catalog.dto;
 
 import java.math.BigDecimal;
 
+// Filter criteria for searching published tour packages
 public class PackageSearchDTO {
 
     private String keyword;
@@ -10,6 +11,7 @@ public class PackageSearchDTO {
     private BigDecimal maxPrice;
     private Integer maxDuration;
 
+    // Getters and Setters
     public String getKeyword() { return keyword; }
     public void setKeyword(String keyword) { this.keyword = keyword; }
 
