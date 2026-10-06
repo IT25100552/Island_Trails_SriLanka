@@ -16,6 +16,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     // Finds all non-archived bookings placed by a specific customer, newest first
     List<Booking> findByCustomerIdAndArchivedFalseOrderByCreatedAtDesc(Long customerId);
 
+    // Checks if any booking exists for a specific customer
+    boolean existsByCustomerId(Long customerId);
+
     // Finds all bookings with a given status, newest first
     List<Booking> findByStatusOrderByCreatedAtDesc(BookingStatus status);
 
