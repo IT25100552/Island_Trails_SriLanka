@@ -9,8 +9,25 @@ import java.util.List;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
+
+    // Finds all bookings placed by a specific customer, newest first
     List<Booking> findByCustomerIdOrderByCreatedAtDesc(Long customerId);
+
+    // Finds all non-archived bookings placed by a specific customer, newest first
+    List<Booking> findByCustomerIdAndArchivedFalseOrderByCreatedAtDesc(Long customerId);
+
+    // Finds all bookings with a given status, newest first
     List<Booking> findByStatusOrderByCreatedAtDesc(BookingStatus status);
+
+    // Gets all bookings across the system, newest first
     List<Booking> findAllByOrderByCreatedAtDesc();
+
+    // Counts how many bookings currently have a given status
     long countByStatus(BookingStatus status);
+
+    // Counts how many bookings belong to a specific package
+    long countByPackageId(Long packageId);
+
+    // Counts how many bookings belong to a specific package with specified statuses
+    long countByPackageIdAndStatusIn(Long packageId, java.util.Collection<BookingStatus> statuses);
 }

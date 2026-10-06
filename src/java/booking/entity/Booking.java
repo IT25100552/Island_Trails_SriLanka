@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+// Represents a customer booking for a tour package
 @Entity
 @Table(name = "bookings")
 public class Booking extends BaseEntity {
@@ -50,9 +51,11 @@ public class Booking extends BaseEntity {
     @Column(name = "cancelled_at")
     private LocalDateTime cancelledAt;
 
+    // Default constructor for JPA
     public Booking() {
     }
 
+    // Creates a new booking with initial PENDING_PAYMENT status
     public Booking(Long customerId, String customerName, Long packageId, String packageName, LocalDate startDate, LocalDate endDate, BigDecimal totalPrice, Integer numberOfTravelers, String specialRequests) {
         this.customerId = customerId;
         this.customerName = customerName;
@@ -67,6 +70,7 @@ public class Booking extends BaseEntity {
         this.status = BookingStatus.PENDING_PAYMENT;
     }
 
+    // Getters and Setters
     public Long getCustomerId() {
         return customerId;
     }

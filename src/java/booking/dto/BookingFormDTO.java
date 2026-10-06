@@ -5,26 +5,27 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
+// Data transfer object for the customer booking form
 public class BookingFormDTO {
 
-    @NotNull(message = "Package ID is required")
+    @NotNull(message = "Required")
     private Long packageId;
 
-    @NotNull(message = "Start date is required")
-    @FutureOrPresent(message = "Start date must be today or in the future")
+    @NotNull(message = "Required")
+    @FutureOrPresent(message = "Must be today or later")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate startDate;
 
-    @NotNull(message = "End date is required")
+    @NotNull(message = "Required")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate endDate;
 
-    @NotNull(message = "Number of travelers is required")
-    @Min(value = 1, message = "At least 1 traveler is required")
-    @Max(value = 50, message = "Maximum 50 travelers allowed per booking")
+    @NotNull(message = "Required")
+    @Min(value = 1, message = "Min 1")
+    @Max(value = 50, message = "Max 50")
     private Integer numberOfTravelers = 1;
 
-    @Size(max = 1000, message = "Special requests cannot exceed 1000 characters")
+    @Size(max = 1000, message = "Max 1,000 characters")
     private String specialRequests;
 
     public Long getPackageId() { return packageId; }
