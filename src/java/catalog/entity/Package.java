@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+// Represents a tour package in the catalog
 @Entity
 @Table(name = "packages")
 public class Package extends BaseEntity {
@@ -24,6 +25,9 @@ public class Package extends BaseEntity {
     @Column(name = "duration_days", nullable = false)
     private Integer durationDays;
 
+    @Column(name = "image_url", length = 255)
+    private String imageUrl;
+
     @Lob
     @Column(name = "image_data")
     private byte[] imageData;
@@ -33,7 +37,7 @@ public class Package extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
-    private PackageStatus status = PackageStatus.DRAFT;
+    private PackageStatus status = PackageStatus.PUBLISHED;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
@@ -45,9 +49,11 @@ public class Package extends BaseEntity {
     @Column(name = "published_at")
     private LocalDateTime publishedAt;
 
+    // Default constructor for JPA
     public Package() {
     }
 
+    // Creates a new tour package with all details
     public Package(String name, String destination, String description, BigDecimal basePrice, Integer durationDays, PackageStatus status, PackageOrigin origin, Long createdBy) {
         this.name = name;
         this.destination = destination;
@@ -62,6 +68,7 @@ public class Package extends BaseEntity {
         }
     }
 
+    // Getters and Setters
     public String getName() {
         return name;
     }
@@ -100,6 +107,14 @@ public class Package extends BaseEntity {
 
     public void setDurationDays(Integer durationDays) {
         this.durationDays = durationDays;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public byte[] getImageData() {
