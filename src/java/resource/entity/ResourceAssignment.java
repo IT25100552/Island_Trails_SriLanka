@@ -4,6 +4,7 @@ import com.islandtrails.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
+// Represents the scheduling or reservation of a resource for a package or booking
 @Entity
 @Table(name = "resource_assignments")
 public class ResourceAssignment extends BaseEntity {
@@ -27,9 +28,11 @@ public class ResourceAssignment extends BaseEntity {
     @Column(nullable = false, length = 30)
     private ResourceAssignmentStatus status = ResourceAssignmentStatus.AVAILABLE;
 
+    // Default constructor for JPA
     public ResourceAssignment() {
     }
 
+    // Creates a new resource assignment for a date range
     public ResourceAssignment(Long packageId, Long resourceId, LocalDate startDate, LocalDate endDate, ResourceAssignmentStatus status) {
         this.packageId = packageId;
         this.resourceId = resourceId;
@@ -38,6 +41,7 @@ public class ResourceAssignment extends BaseEntity {
         this.status = status;
     }
 
+    // Getters and Setters
     public Long getPackageId() {
         return packageId;
     }

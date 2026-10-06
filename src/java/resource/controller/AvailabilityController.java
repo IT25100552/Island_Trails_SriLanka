@@ -20,21 +20,25 @@ public class AvailabilityController {
     private final AvailabilityService availabilityService;
     private final ConflictDetectionService conflictDetectionService;
 
+    // Injects availability and conflict detection services
     public AvailabilityController(AvailabilityService availabilityService, ConflictDetectionService conflictDetectionService) {
         this.availabilityService = availabilityService;
         this.conflictDetectionService = conflictDetectionService;
     }
 
+    // Checks if a specific resource is free or returns all available resources for a date range
     @GetMapping("/api/staff/tour-ops/availability")
     public ResponseEntity<Map<String, Object>> checkAvailability(
             @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(value = "resourceId", required = false) Long resourceId) {
 
+        // Step 1: Put the requested dates in the response map
         Map<String, Object> response = new HashMap<>();
         response.put("startDate", startDate);
         response.put("endDate", endDate);
 
+        // Step 2: Check conflict for a specific resource or query all available resources
         if (resourceId != null) {
             boolean hasConflict = conflictDetectionService.hasConflict(resourceId, startDate, endDate);
             response.put("resourceId", resourceId);
@@ -46,6 +50,7 @@ public class AvailabilityController {
             response.put("availableCount", available.size());
         }
 
+        // Step 3: Return the response as JSON
         return ResponseEntity.ok(response);
     }
 }

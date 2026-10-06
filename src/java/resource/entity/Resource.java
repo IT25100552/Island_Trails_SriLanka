@@ -4,6 +4,7 @@ import com.islandtrails.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
+// Represents an operational resource such as a vehicle, guide, or hotel room
 @Entity
 @Table(name = "resources")
 public class Resource extends BaseEntity {
@@ -52,9 +53,11 @@ public class Resource extends BaseEntity {
     @Column(name = "bed_capacity")
     private Integer bedCapacity;
 
+    // Default constructor for JPA
     public Resource() {
     }
 
+    // Creates a new resource with basic details
     public Resource(ResourceType resourceType, String name, BigDecimal unitCost, ResourceStatus status) {
         this.resourceType = resourceType;
         this.name = name;
@@ -62,6 +65,7 @@ public class Resource extends BaseEntity {
         this.status = status;
     }
 
+    // Getters and Setters
     public ResourceType getResourceType() {
         return resourceType;
     }
